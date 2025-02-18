@@ -55,3 +55,9 @@ export interface ScheduleResponse {
   message: string;
   schedule: TimeSlot[];
 }
+
+export interface CancellationStatus {
+  isValid: boolean;
+  message: string;
+  isLoading: boolean;
+}
