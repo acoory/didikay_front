@@ -1,100 +1,19 @@
-import React, { useEffect, useState } from "react";
-import { ServiceSelection } from "./components/ServiceSelection";
-import { BookingSummary } from "./components/BookingSummary";
-import { DatePicker } from "./components/DatePicker";
-import { Stepper } from "./components/Stepper";
-import { UserForm } from "./components/UserForm";
-import { PaymentStep } from "./components/PaymentStep";
-// import { services } from "./data/services";
-import { BookingSelection, BookingStep, SubPrestation, UserInfo } from "./types/booking";
-import { Scissors } from "lucide-react";
-import { QueryClient, QueryClientProvider, useQuery, useQueryClient } from "react-query";
-import prestationService from "./services/prestationService";
 import { BrowserRouter, Routes, Route } from "react-router";
 
 import Home from "./pages/home";
 import Reservation from "./pages/reservation";
 import BookingSuccess from "./pages/success";
 import SlotNotAvailable from "./pages/slotNotAvailable";
+import Cancel from "./pages/cancel";
 
 function App() {
-  // const [services, setServices] = useState([]);
-  const [currentStep, setCurrentStep] = useState<BookingStep>("services");
-  const [selection, setSelection] = useState<BookingSelection>({
-    prestationId: null,
-    subPrestationSelections: {},
-    selectedDate: null,
-    selectedTime: null,
-    slot: null,
-  });
-  const [devis, setDevis] = useState<any>([]);
-  const [userInfo, setUserInfo] = useState<UserInfo>({
-    firstname: "",
-    lastname: "",
-    email: "",
-    phone: "",
-  });
-  const [services, setServices] = useState([]);
-
-  useEffect(() => {
-    prestationService.getPrestations().then((res) => {
-      console.log(res);
-      if (res.data.prestation) {
-        setServices(res.data.prestation);
-      }
-    });
-  }, []);
-
-  const canProceedToDate = () => {
-    if (!selection.prestationId) return false;
-    const selectedPrestation: any = services.find((s: any) => s.id === selection.prestationId);
-    if (!selectedPrestation) return false;
-    return selectedPrestation.subprestations.every((subPrestation: SubPrestation) => selection.subPrestationSelections[subPrestation.id]);
-  };
-
-  const canProceedToInfo = () => {
-    return selection.selectedDate !== null && selection.selectedTime !== null;
-  };
-
-  const canProceedToPayment = () => {
-    return userInfo.firstname.trim() !== "" && userInfo.lastname.trim() !== "" && userInfo.email.trim() !== "" && userInfo.phone.trim() !== "";
-  };
-
-  const handleDateSelect = (date: Date) => {
-    setSelection((prev) => ({ ...prev, selectedDate: date }));
-  };
-
-  const handleTimeSelect = (time: string, slot: any) => {
-    setSelection((prev) => ({ ...prev, selectedTime: time }));
-    setSelection((prev) => ({ ...prev, slot: slot }));
-  };
-
-  const handleNext = () => {
-    if (currentStep === "services" && canProceedToDate()) {
-      setCurrentStep("date");
-    } else if (currentStep === "date" && canProceedToInfo()) {
-      setCurrentStep("info");
-    } else if (currentStep === "info" && canProceedToPayment()) {
-      setCurrentStep("payment");
-    }
-  };
-
-  const handleBack = () => {
-    if (currentStep === "date") {
-      setCurrentStep("services");
-    } else if (currentStep === "info") {
-      setCurrentStep("date");
-    } else if (currentStep === "payment") {
-      setCurrentStep("info");
-    }
-  };
-
   return (
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/reservation" element={<Reservation />} />
       <Route path="/success" element={<BookingSuccess />} />
       <Route path="/slotNotAvailable" element={<SlotNotAvailable />} />
+      <Route path="/cancel/:id" element={<Cancel />} />
     </Routes>
     // <div className="min-h-screen bg-gray-50">
     //   <header className="bg-white shadow-sm">
