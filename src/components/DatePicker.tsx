@@ -8,10 +8,11 @@ interface DatePickerProps {
   selectedTime: string | null;
   onDateSelect: (date: Date) => void;
   onTimeSelect: (time: string, slot: any) => void;
-  devis: any;
+  selection: any;
+  services: any;
 }
 
-export function DatePicker({ selectedDate, selectedTime, onDateSelect, onTimeSelect, devis }: DatePickerProps) {
+export function DatePicker({ selectedDate, selectedTime, onDateSelect, onTimeSelect, selection, services }: DatePickerProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [showTimeSlots, setShowTimeSlots] = useState(false);
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
@@ -39,15 +40,44 @@ export function DatePicker({ selectedDate, selectedTime, onDateSelect, onTimeSel
     return dates;
   };
 
+  const getSelectedServices = () => {
+    if (!selection.prestationId) return [];
+
+    const selectedServices: Array<{
+      name: string;
+      price: string;
+      duration_minutes: number;
+      description: string;
+    }> = [];
+
+    const selectedPrestation = services.find((p: any) => p.id === selection.prestationId);
+    if (!selectedPrestation) return [];
+
+    selectedPrestation.subprestations.forEach((subPrestation: any) => {
+      const selectedServiceId = selection.subPrestationSelections[subPrestation.id];
+      if (selectedServiceId) {
+        const service = subPrestation.services.find((s: any) => s.id === selectedServiceId);
+        if (service) {
+          selectedServices.push(service);
+        }
+      }
+    });
+
+    return selectedServices;
+  };
+
+  const selectedServices = getSelectedServices();
+  const totalDuration = selectedServices.reduce((sum, service) => sum + service.duration_minutes, 0);
+
   const fetchTimeSlots = async (date: Date) => {
     setIsLoading(true);
     setError(null);
     try {
-      console.log(devis.reduce((total: any, service: any) => total + service.duration_minutes, 0));
       const res = await bookingService
         .getAvailableSlots(
           date.getTime(),
-          devis.reduce((total: any, service: any) => total + service.duration_minutes, 0)
+          // devis.reduce((total: any, service: any) => total + service.duration_minutes, 0)
+          totalDuration
         )
 
         .then((res) => {
