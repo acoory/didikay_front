@@ -112,7 +112,7 @@ export function DatePicker({ selectedDate, selectedTime, onDateSelect, onTimeSel
 
   const formatDate = (date: Date) => {
     moment.locale("fr");
-    return moment(date).format("D MMMM");
+    return moment(date).format("dddd D MMMM");
   };
 
   const formatTime = (dateString: string) => {
