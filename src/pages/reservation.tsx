@@ -11,6 +11,7 @@ import { Scissors } from "lucide-react";
 import { QueryClient, QueryClientProvider, useQuery, useQueryClient } from "react-query";
 import prestationService from "../services/prestationService";
 import { BrowserRouter, Routes, Route } from "react-router";
+import daysOfWeekService from "../services/daysOfWeekService";
 
 function Reservation() {
   // const [services, setServices] = useState([]);
@@ -30,14 +31,24 @@ function Reservation() {
     phone: "",
   });
   const [services, setServices] = useState([]);
+  const [daysOfWeek, setDaysOfWeek] = useState<any>([]);
 
   useEffect(() => {
-    prestationService.getPrestations().then((res) => {
-      console.log(res);
-      if (res.data.prestation) {
-        setServices(res.data.prestation);
+    const fetchData = async () => {
+      try {
+        await Promise.all([prestationService.getPrestations(), daysOfWeekService.getAll()]).then(([prestations, daysOfWeek]) => {
+          console.log("prestations", prestations);
+          console.log("daysOfWeek", daysOfWeek);
+
+          setServices(prestations.data.prestation);
+          setDaysOfWeek(daysOfWeek.data.daysOfWeek);
+        });
+      } catch (error) {
+        console.error("Erreur lors de la récupération des données :", error);
       }
-    });
+    };
+
+    fetchData();
   }, []);
 
   const canProceedToDate = () => {
@@ -132,6 +143,7 @@ function Reservation() {
                   onTimeSelect={handleTimeSelect as any}
                   selection={selection}
                   services={services}
+                  daysOfWeek={daysOfWeek}
                 />
                 {selection.selectedDate && selection.selectedTime && (
                   <div className="mt-6">

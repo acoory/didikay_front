@@ -84,7 +84,7 @@ export function BookingSummary({ services, selection }: BookingSummaryProps) {
           <hr className="my-6 border-gray-200" />
           <div className="flex items-center text-green-600 font-semibold ">
             <Euro className="h-5 w-5 mr-2" />
-            <span>Acompte à régler: 20€</span>
+            <span>Acompte à régler: {(totalPrice > 50 ? totalPrice * 0.4 : 10).toFixed(2)}€</span>
           </div>
           <p className="text-sm text-gray-500">Le reste sera à payer sur place en espèce le jour du rendez-vous merci de prévoir la somme exacte</p>
         </>

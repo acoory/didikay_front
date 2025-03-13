@@ -4,6 +4,9 @@ import stripeService from "../services/stripeService";
 
 export function PaymentStep(props: any) {
   const { userInfo, selection, devis } = props;
+
+  console.log("devis", devis);
+
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
       <div className="text-center mb-6">
