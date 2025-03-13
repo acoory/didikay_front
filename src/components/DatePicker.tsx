@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import { ChevronLeft, ChevronRight, Clock } from "lucide-react";
+// import moment from "moment";
+import "moment/locale/fr";
 import { TimeSlot } from "../types/booking";
 import bookingService from "../services/bookingService";
+import moment from "moment/min/moment-with-locales";
 
 interface DatePickerProps {
   selectedDate: Date | null;
@@ -10,31 +13,33 @@ interface DatePickerProps {
   onTimeSelect: (time: string, slot: any) => void;
   selection: any;
   services: any;
+  daysOfWeek: any;
 }
 
-export function DatePicker({ selectedDate, selectedTime, onDateSelect, onTimeSelect, selection, services }: DatePickerProps) {
-  const [currentMonth, setCurrentMonth] = useState(new Date());
+export function DatePicker({ selectedDate, selectedTime, onDateSelect, onTimeSelect, selection, services, daysOfWeek }: DatePickerProps) {
+  const [currentMonth, setCurrentMonth] = useState(moment());
   const [showTimeSlots, setShowTimeSlots] = useState(false);
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const daysInMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0).getDate();
-
-  const firstDayOfMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1).getDay();
-
   const generateDates = () => {
     const dates = [];
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const firstDay = moment(currentMonth).startOf("month");
+    const daysInMonth = currentMonth.daysInMonth();
+    const startingDay = firstDay.day();
 
-    for (let i = 0; i < firstDayOfMonth; i++) {
+    // Adjust for Monday as first day of week (0 = Monday in our display)
+    const adjustedStartingDay = startingDay === 0 ? 6 : startingDay - 1;
+
+    // Add empty slots for days before the first of the month
+    for (let i = 0; i < adjustedStartingDay; i++) {
       dates.push(null);
     }
 
+    // Add all days of the month
     for (let day = 1; day <= daysInMonth; day++) {
-      const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
-      dates.push(date);
+      dates.push(moment(currentMonth).date(day).toDate());
     }
 
     return dates;
@@ -73,16 +78,9 @@ export function DatePicker({ selectedDate, selectedTime, onDateSelect, onTimeSel
     setIsLoading(true);
     setError(null);
     try {
-      const res = await bookingService
-        .getAvailableSlots(
-          date.getTime(),
-          // devis.reduce((total: any, service: any) => total + service.duration_minutes, 0)
-          totalDuration
-        )
-
-        .then((res) => {
-          setTimeSlots(res.data.schedule);
-        });
+      const res = await bookingService.getAvailableSlots(moment(date).valueOf(), totalDuration).then((res) => {
+        setTimeSlots(res.data.schedule);
+      });
       setShowTimeSlots(true);
     } catch (err) {
       setError("Impossible de récupérer les créneaux horaires. Veuillez réessayer.");
@@ -93,34 +91,51 @@ export function DatePicker({ selectedDate, selectedTime, onDateSelect, onTimeSel
   };
 
   const handleDateClick = async (date: Date) => {
-    onDateSelect(date);
+    console.log("Date selected:", date);
 
+    onDateSelect(date);
     await fetchTimeSlots(date);
   };
 
   const isDateSelected = (date: Date) => {
-    return selectedDate?.toDateString() === date.toDateString();
+    return selectedDate && moment(selectedDate).isSame(date, "day");
   };
 
   const isDateDisabled = (date: Date) => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    return date < today;
+    return moment(date).isBefore(moment().startOf("day"));
   };
 
-  const formatMonth = (date: Date) => {
-    return date.toLocaleDateString("fr-FR", { month: "long", year: "numeric" });
+  const formatMonth = () => {
+    moment.locale("fr");
+    return currentMonth.format("MMMM YYYY");
   };
 
   const formatDate = (date: Date) => {
-    return date.toLocaleDateString("fr-FR", { day: "numeric", month: "long" });
+    moment.locale("fr");
+    return moment(date).format("D MMMM");
   };
 
   const formatTime = (dateString: string) => {
-    return new Date(dateString).toLocaleTimeString("fr-FR", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    return moment(dateString).format("HH:mm");
+  };
+
+  const isClosedDay = (date: any) => {
+    const dayName = moment(date).locale("fr").format("dddd");
+
+    for (let i = 0; i < daysOfWeek.length; i++) {
+      if (daysOfWeek[i].day.toLowerCase() === dayName) {
+        return daysOfWeek[i].closed;
+      }
+    }
+    return false;
+  };
+
+  const handlePreviousMonth = () => {
+    setCurrentMonth(moment(currentMonth).subtract(1, "month"));
+  };
+
+  const handleNextMonth = () => {
+    setCurrentMonth(moment(currentMonth).add(1, "month"));
   };
 
   return (
@@ -128,11 +143,11 @@ export function DatePicker({ selectedDate, selectedTime, onDateSelect, onTimeSel
       {!showTimeSlots ? (
         <>
           <div className="flex items-center justify-between mb-4">
-            <button onClick={() => setCurrentMonth(new Date(currentMonth.setMonth(currentMonth.getMonth() - 1)))} className="p-2 hover:bg-gray-100 rounded-full">
+            <button onClick={handlePreviousMonth} className="p-2 hover:bg-gray-100 rounded-full">
               <ChevronLeft className="w-5 h-5" />
             </button>
-            <h3 className="text-lg font-semibold capitalize">{formatMonth(currentMonth)}</h3>
-            <button onClick={() => setCurrentMonth(new Date(currentMonth.setMonth(currentMonth.getMonth() + 1)))} className="p-2 hover:bg-gray-100 rounded-full">
+            <h3 className="text-lg font-semibold capitalize">{formatMonth()}</h3>
+            <button onClick={handleNextMonth} className="p-2 hover:bg-gray-100 rounded-full">
               <ChevronRight className="w-5 h-5" />
             </button>
           </div>
@@ -149,12 +164,13 @@ export function DatePicker({ selectedDate, selectedTime, onDateSelect, onTimeSel
                 return <div key={`empty-${index}`} />;
               }
 
-              const disabled = isDateDisabled(date);
+              const disabled = isDateDisabled(date) || isClosedDay(date); // Vérifie si la date est fermée
               const selected = isDateSelected(date);
+              const dayName = moment(date).locale("fr").format("dddd"); // Ex: "l
 
               return (
                 <button
-                  key={date.toISOString()}
+                  key={moment(date).format()}
                   onClick={() => !disabled && handleDateClick(date)}
                   disabled={disabled}
                   className={`
@@ -163,7 +179,7 @@ export function DatePicker({ selectedDate, selectedTime, onDateSelect, onTimeSel
                     ${selected ? "bg-purple-600 text-white hover:bg-purple-700" : ""}
                   `}
                 >
-                  {date.getDate()}
+                  {moment(date).date()}
                 </button>
               );
             })}

@@ -28,7 +28,11 @@ export function UserForm({ userInfo, onUserInfoChange }: UserFormProps) {
             name="firstname"
             value={userInfo.firstname}
             onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+            style={{
+              border: "1px solid #bbbbbb",
+              padding: "5px",
+            }}
+            className="mt-1 block w-full rounded-md  shadow-sm focus:border-purple-500 focus:ring-purple-500"
             required
           />
         </div>
@@ -43,7 +47,11 @@ export function UserForm({ userInfo, onUserInfoChange }: UserFormProps) {
             name="lastname"
             value={userInfo.lastname}
             onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+            style={{
+              border: "1px solid #bbbbbb",
+              padding: "5px",
+            }}
+            className="mt-1 block w-full rounded-md shadow-sm focus:border-purple-500 focus:ring-purple-500"
             required
           />
         </div>
@@ -58,7 +66,11 @@ export function UserForm({ userInfo, onUserInfoChange }: UserFormProps) {
             name="email"
             value={userInfo.email}
             onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+            style={{
+              border: "1px solid #bbbbbb",
+              padding: "5px",
+            }}
+            className="mt-1 block w-full rounded-md  shadow-sm focus:border-purple-500 focus:ring-purple-500"
             required
           />
         </div>
@@ -73,7 +85,11 @@ export function UserForm({ userInfo, onUserInfoChange }: UserFormProps) {
             name="phone"
             value={userInfo.phone}
             onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+            style={{
+              border: "1px solid #bbbbbb",
+              padding: "5px",
+            }}
+            className="mt-1 block w-full rounded-md shadow-sm focus:border-purple-500 focus:ring-purple-500"
             required
           />
         </div>

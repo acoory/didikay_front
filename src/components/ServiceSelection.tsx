@@ -39,6 +39,7 @@ export function ServiceSelection({ services, selection, onSelect, setDevis, devi
             key={prestation.id}
             onClick={() => {
               handlePrestationSelect(prestation.id);
+              setDevis([]);
             }}
             className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
           >
@@ -80,18 +81,32 @@ export function ServiceSelection({ services, selection, onSelect, setDevis, devi
                     <button
                       key={service.id}
                       onClick={() => {
-                        setDevis((prevDevis: any) => [...prevDevis, service]);
+                        console.log("subPrestationLength", selectedPrestation.subprestations.length);
+                        console.log("SubPrestation", selectedPrestation.subprestations);
+                        setDevis((prevDevis: any) => {
+                          const exists = prevDevis.some((item: any) => item.subprestation_id === service.subprestation_id);
+
+                          if (exists) {
+                            return prevDevis.map((item: any) => (item.subprestation_id === service.subprestation_id ? service : item));
+                          } else {
+                            return [...prevDevis, service];
+                          }
+                        });
+
                         handleServiceSelect(selectedPrestation.id, subPrestation.id, service.id);
                       }}
-                      className={`flex items-center justify-between p-3 rounded-lg border transition-all ${
+                      className={`flex flex-col gap-2 items-center justify-between p-3 rounded-lg border transition-all ${
                         selection.subPrestationSelections[subPrestation.id] === service.id
                           ? "bg-purple-50 border-purple-500 text-purple-700"
                           : "border-gray-200 hover:border-purple-200 hover:bg-purple-50"
                       }`}
                     >
                       <div className="flex flex-col">
-                        <span className="font-medium">{service.name}</span>
-                        <span className="text-sm text-gray-500">{service.duration_minutes} min</span>
+                        <div className="flex flex-row items-center space-x-2 justify-center">
+                          <span className="font-medium">{service.name}</span>
+                          <span className="text-sm text-gray-500">{service.duration_minutes} min</span>
+                        </div>
+
                         {service.description && <span className="text-xs text-gray-400">{service.description}</span>}
                       </div>
                       <div className="flex items-center space-x-2">
