@@ -58,6 +58,8 @@ export function ServiceSelection({ services, selection, onSelect, setDevis, devi
   const selectedPrestation = services.find((s) => s.id === selection.prestationId);
   if (!selectedPrestation) return null;
 
+  console.log(selectedPrestation);
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -72,30 +74,32 @@ export function ServiceSelection({ services, selection, onSelect, setDevis, devi
             <div key={subPrestation.id} className="space-y-2">
               <h4 className="font-medium text-gray-700">{subPrestation.name}</h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {subPrestation.services.map((service) => (
-                  <button
-                    key={service.id}
-                    onClick={() => {
-                      setDevis((prevDevis: any) => [...prevDevis, service]);
-                      handleServiceSelect(selectedPrestation.id, subPrestation.id, service.id);
-                    }}
-                    className={`flex items-center justify-between p-3 rounded-lg border transition-all ${
-                      selection.subPrestationSelections[subPrestation.id] === service.id
-                        ? "bg-purple-50 border-purple-500 text-purple-700"
-                        : "border-gray-200 hover:border-purple-200 hover:bg-purple-50"
-                    }`}
-                  >
-                    <div className="flex flex-col">
-                      <span className="font-medium">{service.name}</span>
-                      <span className="text-sm text-gray-500">{service.duration_minutes} min</span>
-                      {service.description && <span className="text-xs text-gray-400">{service.description}</span>}
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <span className="font-semibold">{service.price}€</span>
-                      <ChevronRight className="h-4 w-4" />
-                    </div>
-                  </button>
-                ))}
+                {subPrestation.services
+                  .sort((a: any, b: any) => a?.price - b?.price)
+                  .map((service) => (
+                    <button
+                      key={service.id}
+                      onClick={() => {
+                        setDevis((prevDevis: any) => [...prevDevis, service]);
+                        handleServiceSelect(selectedPrestation.id, subPrestation.id, service.id);
+                      }}
+                      className={`flex items-center justify-between p-3 rounded-lg border transition-all ${
+                        selection.subPrestationSelections[subPrestation.id] === service.id
+                          ? "bg-purple-50 border-purple-500 text-purple-700"
+                          : "border-gray-200 hover:border-purple-200 hover:bg-purple-50"
+                      }`}
+                    >
+                      <div className="flex flex-col">
+                        <span className="font-medium">{service.name}</span>
+                        <span className="text-sm text-gray-500">{service.duration_minutes} min</span>
+                        {service.description && <span className="text-xs text-gray-400">{service.description}</span>}
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <span className="font-semibold">{service.price}€</span>
+                        <ChevronRight className="h-4 w-4" />
+                      </div>
+                    </button>
+                  ))}
               </div>
             </div>
           ))}

@@ -83,6 +83,7 @@ function Reservation() {
       setCurrentStep("info");
     }
   };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white shadow-sm">
@@ -129,7 +130,8 @@ function Reservation() {
                   selectedTime={selection.selectedTime as string}
                   onDateSelect={handleDateSelect}
                   onTimeSelect={handleTimeSelect as any}
-                  devis={devis}
+                  selection={selection}
+                  services={services}
                 />
                 {selection.selectedDate && selection.selectedTime && (
                   <div className="mt-6">
