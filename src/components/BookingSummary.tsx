@@ -1,6 +1,10 @@
 import React from "react";
 import { Prestation, BookingSelection } from "../types/booking";
 import { Clock, Euro } from "lucide-react";
+import moment from "moment/min/moment-with-locales";
+import "moment/locale/fr";
+
+moment.locale("fr");
 
 interface BookingSummaryProps {
   services: Prestation[];
@@ -38,13 +42,15 @@ export function BookingSummary({ services, selection }: BookingSummaryProps) {
   const totalPrice = selectedServices.reduce((sum, service) => sum + parseFloat(service.price), 0);
   const totalDuration = selectedServices.reduce((sum, service) => sum + service.duration_minutes, 0);
 
+  const duration = moment.duration(totalDuration, "minutes");
+  const hours = Math.floor(duration.asHours());
+  const minutes = duration.minutes();
+
   const formatDate = (date: Date) => {
-    return date.toLocaleDateString("fr-FR", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
+    return moment(date).format("dddd D MMMM");
   };
+
+  console.log(selection.selectedDate);
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
@@ -74,7 +80,9 @@ export function BookingSummary({ services, selection }: BookingSummaryProps) {
           <div className="space-y-3">
             <div className="flex items-center text-gray-600">
               <Clock className="h-5 w-5 mr-2" />
-              <span>Durée totale: {totalDuration} min</span>
+              <span>
+                Durée totale: {hours}h{minutes.toFixed(0).padStart(2, "0")}{" "}
+              </span>
             </div>
             <div className="flex items-center text-gray-600">
               <Euro className="h-5 w-5 mr-2" />

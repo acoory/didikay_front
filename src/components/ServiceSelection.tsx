@@ -1,6 +1,7 @@
 import React from "react";
 import { Prestation, BookingSelection } from "../types/booking";
 import { ChevronRight } from "lucide-react";
+import moment from "moment";
 
 interface ServiceSelectionProps {
   services: Prestation[];
@@ -29,6 +30,20 @@ export function ServiceSelection({ services, selection, onSelect, setDevis, devi
         [subPrestationId]: serviceId,
       },
     });
+  };
+
+  const minutesToHours = (totalDuration: number) => {
+    const duration = moment.duration(totalDuration, "minutes");
+    const hours = Math.floor(duration.asHours());
+    const minutes = duration.minutes();
+
+    if (hours > 0 && minutes > 0) {
+      return `${hours}h${minutes.toString().padStart(2, "0")}min`;
+    } else if (hours > 0) {
+      return `${hours}h`;
+    } else {
+      return `${minutes}min`;
+    }
   };
 
   if (!selection.prestationId) {
@@ -104,7 +119,7 @@ export function ServiceSelection({ services, selection, onSelect, setDevis, devi
                       <div className="flex flex-col">
                         <div className="flex flex-row items-center space-x-2 justify-center">
                           <span className="font-medium">{service.name}</span>
-                          <span className="text-sm text-gray-500">{service.duration_minutes} min</span>
+                          <span className="text-sm text-gray-500">{minutesToHours(service.duration_minutes)}</span>
                         </div>
 
                         {service.description && <span className="text-xs text-gray-400">{service.description}</span>}
