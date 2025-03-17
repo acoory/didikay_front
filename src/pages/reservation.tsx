@@ -179,7 +179,7 @@ function Reservation() {
                 )}
               </>
             )}
-
+            {/* test */}
             {currentStep === "payment" && (
               <>
                 <div className="flex items-center justify-between mb-4">
