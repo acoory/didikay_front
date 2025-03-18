@@ -1,6 +1,6 @@
 import React from "react";
 import { Prestation, BookingSelection } from "../types/booking";
-import { Clock, Euro } from "lucide-react";
+import { Clock, Euro, User } from "lucide-react";
 import moment from "moment/min/moment-with-locales";
 import "moment/locale/fr";
 
@@ -9,9 +9,10 @@ moment.locale("fr");
 interface BookingSummaryProps {
   services: Prestation[];
   selection: BookingSelection;
+  userInfo: any;
 }
 
-export function BookingSummary({ services, selection }: BookingSummaryProps) {
+export function BookingSummary({ services, selection, userInfo }: BookingSummaryProps) {
   const getSelectedServices = () => {
     if (!selection.prestationId) return [];
 
@@ -55,6 +56,18 @@ export function BookingSummary({ services, selection }: BookingSummaryProps) {
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
       <h2 className="text-xl font-semibold mb-4">Récapitulatif de la réservation</h2>
+      <div className="flex items-center space-x-2 mb-6">
+        <div className="flex items-center space-x-2">
+          {/* <img src={userInfo.profile_image} alt={userInfo.full_name} className="w-12 h-12 rounded-full" /> */}
+          <User />
+          <div>
+            <p className="font-semibold">
+              {userInfo.firstname} {userInfo.lastname}
+            </p>
+            <p className="text-sm text-gray-500">{userInfo.email}</p>
+          </div>
+        </div>
+      </div>
 
       {selectedServices.length > 0 ? (
         <>
