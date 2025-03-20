@@ -78,7 +78,7 @@ export function DatePicker({ selectedDate, selectedTime, onDateSelect, onTimeSel
     setIsLoading(true);
     setError(null);
     try {
-      const res = await bookingService.getAvailableSlots(moment(date).valueOf(), totalDuration).then((res) => {
+       await bookingService.getAvailableSlots(moment(date).valueOf(), totalDuration).then((res) => {
         setTimeSlots(res.data.schedule);
       });
       setShowTimeSlots(true);
