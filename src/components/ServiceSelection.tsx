@@ -58,7 +58,7 @@ export function ServiceSelection({ services, selection, onSelect, setDevis, devi
             }}
             className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
           >
-            <div className="p-6 bg-gradient-to-r from-purple-600 to-purple-800">
+            <div className="p-6 bg-gradient-to-r from-[#e86126] to-[#ec7f2b]">
               <h3 className="text-2xl font-semibold text-white">{prestation.name}</h3>
             </div>
             <div className="p-4 flex items-center justify-between text-gray-600">
@@ -77,64 +77,67 @@ export function ServiceSelection({ services, selection, onSelect, setDevis, devi
   console.log(selectedPrestation);
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h3 className="text-xl font-semibold text-gray-900">{selectedPrestation.name}</h3>
-        <button onClick={() => handlePrestationSelect(0)} className="text-purple-600 hover:text-purple-800 font-medium">
-          Changer de prestation
-        </button>
-      </div>
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="p-4 space-y-6">
-          {selectedPrestation.subprestations.map((subPrestation) => (
-            <div key={subPrestation.id} className="space-y-2">
-              <h4 className="font-medium text-gray-700">{subPrestation.name}</h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {subPrestation.services
-                  .sort((a: any, b: any) => a?.price - b?.price)
-                  .map((service) => (
-                    <button
-                      key={service.id}
-                      onClick={() => {
-                        console.log("subPrestationLength", selectedPrestation.subprestations.length);
-                        console.log("SubPrestation", selectedPrestation.subprestations);
-                        setDevis((prevDevis: any) => {
-                          const exists = prevDevis.some((item: any) => item.subprestation_id === service.subprestation_id);
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h3 className="text-xl font-semibold text-gray-900">{selectedPrestation.name}</h3>
+          <button onClick={() => handlePrestationSelect(0)} className="text-[#e86126] hover:text-[#ec7f2b] font-medium">
+            Changer de prestation
+          </button>
+        </div>
+        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+          <div className="p-4 space-y-6">
+            {selectedPrestation.subprestations.map((subPrestation) => (
+                <div key={subPrestation.id} className="space-y-2">
+                  <h4 className="font-medium text-gray-700">{subPrestation.name}</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {subPrestation.services
+                        .sort((a: any, b: any) => a?.price - b?.price)
+                        .map((service) => (
+                            <button
+                                key={service.id}
+                                onClick={() => {
+                                  console.log("subPrestationLength", selectedPrestation.subprestations.length);
+                                  console.log("SubPrestation", selectedPrestation.subprestations);
+                                  setDevis((prevDevis: any) => {
+                                    const exists = prevDevis.some((item: any) => item.subprestation_id === service.subprestation_id);
 
-                          if (exists) {
-                            return prevDevis.map((item: any) => (item.subprestation_id === service.subprestation_id ? service : item));
-                          } else {
-                            return [...prevDevis, service];
-                          }
-                        });
+                                    if (exists) {
+                                      return prevDevis.map((item: any) => (item.subprestation_id === service.subprestation_id ? service : item));
+                                    } else {
+                                      return [...prevDevis, service];
+                                    }
+                                  });
 
-                        handleServiceSelect(selectedPrestation.id, subPrestation.id, service.id);
-                      }}
-                      className={`flex flex-col gap-2 items-center justify-between p-3 rounded-lg border transition-all ${
-                        selection.subPrestationSelections[subPrestation.id] === service.id
-                          ? "bg-purple-50 border-purple-500 text-purple-700"
-                          : "border-gray-200 hover:border-purple-200 hover:bg-purple-50"
-                      }`}
-                    >
-                      <div className="flex flex-col">
-                        <div className="flex flex-row items-center space-x-2 justify-center">
-                          <span className="font-medium">{service.name}</span>
-                          <span className="text-sm text-gray-500">{minutesToHours(service.duration_minutes)}</span>
-                        </div>
+                                  handleServiceSelect(selectedPrestation.id, subPrestation.id, service.id);
+                                }}
+                                className={`flex flex-col gap-2 items-center justify-between p-3 rounded-lg border transition-all ${
+                                    selection.subPrestationSelections[subPrestation.id] === service.id
+                                        ? "bg-[#ec7f2b26] border-[#e86126] text-[#e86126]"
+                                        : "border-gray-200 hover:border-[#ec7f2b] hover:bg-[#ec7f2b26]"
+                                }`}
+                            >
+                              <div className="flex flex-col">
+                                <div className="flex flex-row items-center space-x-2 justify-center">
+                                  <span className="font-medium text-black" >{service.name}</span>
+                                  <span
+                                      className="text-sm text-gray-500">{minutesToHours(service.duration_minutes)}</span>
+                                </div>
 
-                        {service.description && <span className="text-xs text-gray-400">{service.description}</span>}
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <span className="font-semibold">{service.price}€</span>
-                        <ChevronRight className="h-4 w-4" />
-                      </div>
-                    </button>
-                  ))}
-              </div>
-            </div>
-          ))}
+                                {service.description &&
+                                    <span className="text-xs text-gray-400">{service.description}</span>}
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <span className="font-semibold text-black">{service.price}€</span>
+                                <ChevronRight className="h-4 w-4"/>
+                              </div>
+                            </button>
+                        ))}
+                  </div>
+                </div>
+            ))}
+          </div>
         </div>
       </div>
-    </div>
+
   );
 }

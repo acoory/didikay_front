@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
 import { InstagramCounter } from './InstagramCounter';
+import {useNavigate} from "react-router";
 
 export const Header: React.FC = () => {
     const [scrolled, setScrolled] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
+
+    const navigation= useNavigate();
 
     useEffect(() => {
         const handleScroll = () => {
@@ -46,7 +49,9 @@ export const Header: React.FC = () => {
                        className={`transition-all font-medium ${scrolled ? "text-gray-900 hover:text-black" : "text-white hover:opacity-80"}`}>
                         Nos Réalisations
                     </a>
-                    <a href="/reservation"
+                    <a
+                        onClick={() => navigation("/reservation")}
+                        href="/reservation"
                        className={`transition-all font-medium ${scrolled ? "text-gray-900 hover:text-black" : "text-white hover:opacity-80"}`}>
                         Réserver
                     </a>

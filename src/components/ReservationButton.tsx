@@ -18,9 +18,9 @@ export const ReservationButton: React.FC = () => {
         <button
             onClick={() => navigate("/reservation")}
             className={`
-        relative bg-gradient-to-r from-[#6e23ae] to-[#bc97db] text-white 
+        relative bg-gradient-to-r from-[#e86126] to-[#ec7f2b] text-white 
         px-8 py-3 rounded-full font-semibold text-lg flex items-center gap-2 
-        overflow-hidden group hover:shadow-lg hover:shadow-purple-500/25 
+        overflow-hidden group hover:shadow-lg hover:bg-gradient-to-r hover:from-[#e86126] hover:to-[#ec7f2b]
         transition-all duration-1000 ease-out
         transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}
       `}

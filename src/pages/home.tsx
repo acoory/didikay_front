@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import { MapPin, Phone, Mail, Instagram, Facebook } from "lucide-react";
 // import ImageCarousel from "../components/ImageCarousel";
 import { Header } from "../components/Header.tsx";
@@ -11,20 +11,43 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 
 const images = [
-  "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=1920&q=80",
-  "https://plus.unsplash.com/premium_photo-1673697239909-e11521d1ba94?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  "https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?w=1920&q=80",
-  "https://images.unsplash.com/photo-1472120435266-53107fd0c44a?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  "/images/realisations/rea_1.webp",
+  "/images/realisations/rea_2.webp",
+  "/images/realisations/rea_3.webp",
+  "/images/realisations/rea_4.webp",
+  "/images/realisations/rea_5.webp",
+  "/images/realisations/rea_6.webp",
+  "/images/realisations/rea_7.webp",
+  "/images/realisations/rea_8.webp",
+  "/images/realisations/rea_9.webp",
 ];
+
 
 function Home() {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [slidesPerView, setSlidesPerView] = useState(2.5);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth <= 768) {
+        setSlidesPerView(1.5);  // Sur mobile, afficher 1 slide
+      } else {
+        setSlidesPerView(2.5);  // Sur les écrans plus grands, afficher 2.5 slides
+      }
+    };
+
+    handleResize(); // Appel initial
+    window.addEventListener('resize', handleResize);
+
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   return (
       <div className="min-h-screen bg-white">
         <Header/>
 
         {/* Hero Section */}
         <motion.div
+            id={"salon"}
             initial={{opacity: 0, y: -20}}
             animate={{opacity: 1, y: 0}}
             transition={{duration: 1}}
@@ -64,6 +87,7 @@ function Home() {
 
         {/* Carousel Section */}
         <motion.section
+            id={"realisations"}
             initial={{opacity: 0, y: 50}}
             whileInView={{opacity: 1, y: 0}}
             viewport={{once: true}}
@@ -78,9 +102,9 @@ function Home() {
                 modules={[Parallax, Autoplay]}
                 autoplay={{ delay: 3000, disableOnInteraction: false }}
                 speed={800}
-                spaceBetween={-20}
+                spaceBetween={20}
                 loop={true}
-                slidesPerView={1.5}
+                slidesPerView={slidesPerView}
                 centeredSlides={true}
                 parallax={true}
                 onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
@@ -114,6 +138,7 @@ function Home() {
 
           {/* About Section */}
           <motion.section
+              id={"about"}
               initial={{opacity: 0, y: 50}}
               whileInView={{opacity: 1, y: 0}}
               viewport={{once: true}}

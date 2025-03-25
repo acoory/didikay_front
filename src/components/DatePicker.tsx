@@ -139,104 +139,107 @@ export function DatePicker({ selectedDate, selectedTime, onDateSelect, onTimeSel
   };
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      {!showTimeSlots ? (
-        <>
-          <div className="flex items-center justify-between mb-4">
-            <button onClick={handlePreviousMonth} className="p-2 hover:bg-gray-100 rounded-full">
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-            <h3 className="text-lg font-semibold capitalize">{formatMonth()}</h3>
-            <button onClick={handleNextMonth} className="p-2 hover:bg-gray-100 rounded-full">
-              <ChevronRight className="w-5 h-5" />
-            </button>
-          </div>
-          <div className="grid grid-cols-7 gap-2 mb-2">
-            {["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"].map((day) => (
-              <div key={day} className="text-center text-sm font-medium text-gray-600">
-                {day}
+      <div className="bg-white rounded-lg shadow p-6">
+        {!showTimeSlots ? (
+            <>
+              <div className="flex items-center justify-between mb-4">
+                <button onClick={handlePreviousMonth} className="p-2 hover:bg-gray-100 rounded-full">
+                  <ChevronLeft className="w-5 h-5"/>
+                </button>
+                <h3 className="text-lg font-semibold capitalize">{formatMonth()}</h3>
+                <button onClick={handleNextMonth} className="p-2 hover:bg-gray-100 rounded-full">
+                  <ChevronRight className="w-5 h-5"/>
+                </button>
               </div>
-            ))}
-          </div>
-          <div className="grid grid-cols-7 gap-2">
-            {generateDates().map((date, index) => {
-              if (!date) {
-                return <div key={`empty-${index}`} />;
-              }
+              <div className="grid grid-cols-7 gap-2 mb-2">
+                {["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"].map((day) => (
+                    <div key={day} className="text-center text-sm font-medium text-gray-600">
+                      {day}
+                    </div>
+                ))}
+              </div>
+              <div className="grid grid-cols-7 gap-2">
+                {generateDates().map((date, index) => {
+                  if (!date) {
+                    return <div key={`empty-${index}`}/>;
+                  }
 
-              const disabled = isDateDisabled(date) || isClosedDay(date); // Vérifie si la date est fermée
-              const selected = isDateSelected(date);
+                  const disabled = isDateDisabled(date) || isClosedDay(date);
+                  const selected = isDateSelected(date);
 
-              return (
-                <button
-                  key={moment(date).format()}
-                  onClick={() => !disabled && handleDateClick(date)}
-                  disabled={disabled}
-                  className={`
-                    p-2 rounded-full text-sm
-                    ${disabled ? "text-gray-300 cursor-not-allowed" : "hover:bg-purple-50"}
-                    ${selected ? "bg-purple-600 text-white hover:bg-purple-700" : ""}
-                  `}
-                >
-                  {moment(date).date()}
+                  return (
+                      <button
+                          key={moment(date).format()}
+                          onClick={() => !disabled && handleDateClick(date)}
+                          disabled={disabled}
+                          className={`
+                p-2 rounded-full text-sm
+                ${disabled ? "text-gray-300 cursor-not-allowed" : "hover:bg-[#ec7f2b26]"}
+                ${selected ? "bg-[#e86126] text-white hover:bg-[#ec7f2b]" : ""}
+              `}
+                      >
+                        {moment(date).date()}
+                      </button>
+                  );
+                })}
+              </div>
+            </>
+        ) : (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <Clock className="w-5 h-5 text-[#e86126]"/>
+                  <h3 className="text-lg font-semibold">
+                    Horaires disponibles pour le {formatDate(selectedDate!)}
+                  </h3>
+                </div>
+                <button onClick={() => setShowTimeSlots(false)}
+                        className="text-[#e86126] hover:text-[#ec7f2b] font-medium">
+                  ← Changer la date
                 </button>
-              );
-            })}
-          </div>
-        </>
-      ) : (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Clock className="w-5 h-5 text-purple-600" />
-              <h3 className="text-lg font-semibold">Horaires disponibles pour le {formatDate(selectedDate!)}</h3>
+              </div>
+
+              {isLoading && (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#e86126] mx-auto"></div>
+                    <p className="mt-2 text-gray-600">Chargement des créneaux...</p>
+                  </div>
+              )}
+
+              {error && <div className="bg-red-50 text-red-600 p-4 rounded-lg">{error}</div>}
+
+              {!isLoading && !error && (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {timeSlots.map((slot) => (
+                        <button
+                            key={slot.start_unix}
+                            onClick={() => !slot.busy && onTimeSelect(formatTime(slot.start), slot)}
+                            disabled={slot.busy}
+                            className={`
+                p-3 rounded-lg border text-center transition-all
+                ${
+                                slot.busy
+                                    ? "bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200"
+                                    : selectedTime === formatTime(slot.start)
+                                        ? "bg-[#ec7f2b26] border-[#e86126] text-[#e86126]"
+                                        : "border-gray-200 hover:border-[#ec7f2b] hover:bg-[#ec7f2b26]"
+                            }
+              `}
+                        >
+                          {formatTime(slot.start)}
+                          {!slot.vaccation && slot.busy && (
+                              <span className="block text-xs text-gray-500">Indisponible</span>
+                          )}
+                          {slot.vaccation && (
+                              <span className="block text-xs text-gray-500">En congé</span>
+                          )}
+                        </button>
+                    ))}
+                  </div>
+              )}
             </div>
-            <button onClick={() => setShowTimeSlots(false)} className="text-purple-600 hover:text-purple-800 font-medium">
-              ← Changer la date
-            </button>
-          </div>
+        )}
+      </div>
 
-          {isLoading && (
-            <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
-              <p className="mt-2 text-gray-600">Chargement des créneaux...</p>
-            </div>
-          )}
-
-          {error && <div className="bg-red-50 text-red-600 p-4 rounded-lg">{error}</div>}
-
-          {!isLoading && !error && (
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {timeSlots.map((slot) => (
-                <button
-                  key={slot.start_unix}
-                  onClick={() => !slot.busy && onTimeSelect(formatTime(slot.start), slot)}
-                  disabled={slot.busy}
-                  className={`
-                    p-3 rounded-lg border text-center transition-all
-                    ${
-                      slot.busy
-                        ? "bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200"
-                        : selectedTime === formatTime(slot.start)
-                        ? "bg-purple-50 border-purple-500 text-purple-700"
-                        : "border-gray-200 hover:border-purple-200 hover:bg-purple-50"
-                    }
-                  `}
-                >
-                  {formatTime(slot.start)}
-                  {!slot.vaccation && slot.busy && (
-                      <span className="block text-xs text-gray-500">Indisponible</span>
-                  )}
-                  {slot.vaccation && (
-                      <span className="block text-xs text-gray-500">En congé</span>
-                  )}
-
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-    </div>
   );
 }

@@ -54,64 +54,67 @@ export function BookingSummary({ services, selection, userInfo }: BookingSummary
   console.log(selection.selectedDate);
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-xl font-semibold mb-4">Récapitulatif de la réservation</h2>
-      <div className="flex items-center space-x-2 mb-6">
-        <div className="flex items-center space-x-2">
-          {/* <img src={userInfo.profile_image} alt={userInfo.full_name} className="w-12 h-12 rounded-full" /> */}
-          <User />
-          <div>
-            <p className="font-semibold">
-              {userInfo.firstname} {userInfo.lastname}
-            </p>
-            <p className="text-sm text-gray-500">{userInfo.email}</p>
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <h2 className="text-xl font-semibold mb-4">Récapitulatif de la réservation</h2>
+        <div className="flex items-center space-x-2 mb-6">
+          <div className="flex items-center space-x-2">
+            {/* <img src={userInfo.profile_image} alt={userInfo.full_name} className="w-12 h-12 rounded-full" /> */}
+            <User/>
+            <div>
+              <p className="font-semibold">
+                {userInfo.firstname} {userInfo.lastname}
+              </p>
+              <p className="text-sm text-gray-500">{userInfo.email}</p>
+            </div>
           </div>
         </div>
+
+        {selectedServices.length > 0 ? (
+            <>
+              <div className="space-y-4 mb-6">
+                {selectedServices.map((service, index) => (
+                    <div key={index} className="flex justify-between items-start py-2 border-b">
+                      <div>
+                        <span className="font-medium">{service.name}</span>
+                        {service.description && <p className="text-sm text-gray-500">{service.description}</p>}
+                      </div>
+                      <span className="text-[#e86126] font-semibold">{service.price}€</span>
+                    </div>
+                ))}
+              </div>
+
+              {selection.selectedDate && selection.selectedTime && (
+                  <div className="mb-6 p-3 bg-[#fdeae1] rounded-lg">
+                    <p className="font-medium text-[#ec7f2b]">📅 {formatDate(selection.selectedDate)}</p>
+                    <p className="font-medium text-[#ec7f2b]">🕒 {selection.selectedTime}</p>
+                  </div>
+              )}
+
+              <div className="space-y-3">
+                <div className="flex items-center text-gray-600">
+                  <Clock className="h-5 w-5 mr-2"/>
+                  <span>
+            Durée totale: {hours}h{minutes.toFixed(0).padStart(2, "0")}{" "}
+          </span>
+                </div>
+                <div className="flex items-center text-gray-600">
+                  <Euro className="h-5 w-5 mr-2"/>
+                  <span>Total: {totalPrice.toFixed(2)}€</span>
+                </div>
+              </div>
+              <hr className="my-6 border-gray-200"/>
+              <div className="flex items-center text-green-600 font-semibold ">
+                <Euro className="h-5 w-5 mr-2"/>
+                <span>Acompte à régler: {(totalPrice > 50 ? totalPrice * 0.4 : 10).toFixed(2)}€</span>
+              </div>
+              <p className="text-sm text-gray-500">
+                Le reste sera à payer sur place en espèce le jour du rendez-vous merci de prévoir la somme exacte
+              </p>
+            </>
+        ) : (
+            <p className="text-gray-500">Sélectionnez vos services pour voir le récapitulatif</p>
+        )}
       </div>
 
-      {selectedServices.length > 0 ? (
-        <>
-          <div className="space-y-4 mb-6">
-            {selectedServices.map((service, index) => (
-              <div key={index} className="flex justify-between items-start py-2 border-b">
-                <div>
-                  <span className="font-medium">{service.name}</span>
-                  {service.description && <p className="text-sm text-gray-500">{service.description}</p>}
-                </div>
-                <span className="text-purple-600 font-semibold">{service.price}€</span>
-              </div>
-            ))}
-          </div>
-
-          {selection.selectedDate && selection.selectedTime && (
-            <div className="mb-6 p-3 bg-purple-50 rounded-lg">
-              <p className="font-medium text-purple-800">📅 {formatDate(selection.selectedDate)}</p>
-              <p className="font-medium text-purple-800">🕒 {selection.selectedTime}</p>
-            </div>
-          )}
-
-          <div className="space-y-3">
-            <div className="flex items-center text-gray-600">
-              <Clock className="h-5 w-5 mr-2" />
-              <span>
-                Durée totale: {hours}h{minutes.toFixed(0).padStart(2, "0")}{" "}
-              </span>
-            </div>
-            <div className="flex items-center text-gray-600">
-              <Euro className="h-5 w-5 mr-2" />
-              <span>Total: {totalPrice.toFixed(2)}€</span>
-            </div>
-          </div>
-          <hr className="my-6 border-gray-200" />
-          <div className="flex items-center text-green-600 font-semibold ">
-            <Euro className="h-5 w-5 mr-2" />
-            <span>Acompte à régler: {(totalPrice > 50 ? totalPrice * 0.4 : 10).toFixed(2)}€</span>
-          </div>
-          <p className="text-sm text-gray-500">Le reste sera à payer sur place en espèce le jour du rendez-vous merci de prévoir la somme exacte</p>
-        </>
-      ) : (
-        <p className="text-gray-500">Sélectionnez vos services pour voir le récapitulatif</p>
-      )}
-    </div>
   );
 }
