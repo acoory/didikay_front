@@ -50,6 +50,7 @@ export interface TimeSlot {
   end: string;
   end_unix: number;
   busy: boolean;
+  vaccation: boolean;
 }
 
 export interface ScheduleResponse {

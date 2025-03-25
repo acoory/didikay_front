@@ -1,97 +1,218 @@
-import React from "react";
-import { MapPin, Phone, Mail, Instagram, Facebook, Calendar } from "lucide-react";
-import ImageCarousel from "../components/ImageCarousel";
-import { useNavigate } from "react-router";
+import React, {useState} from "react";
+import { MapPin, Phone, Mail, Instagram, Facebook } from "lucide-react";
+// import ImageCarousel from "../components/ImageCarousel";
+import { Header } from "../components/Header.tsx";
+import { ReservationButton } from "../components/ReservationButton.tsx";
+import { motion } from "framer-motion";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination, Autoplay, Parallax } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+
+const images = [
+  "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=1920&q=80",
+  "https://plus.unsplash.com/premium_photo-1673697239909-e11521d1ba94?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  "https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?w=1920&q=80",
+  "https://images.unsplash.com/photo-1472120435266-53107fd0c44a?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+];
 
 function Home() {
-  const navigate = useNavigate();
+  const [activeIndex, setActiveIndex] = useState(0);
   return (
-    <div className="min-h-screen bg-white">
-      {/* Hero Section */}
-      <div
-        className="relative h-[80vh] bg-cover bg-center"
-        style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80")' }}
-      >
-        <div className="absolute inset-0 bg-black bg-opacity-50" />
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-white px-4">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 text-center">KAYDIDI</h1>
-          <p className="text-xl md:text-2xl mb-8 text-center max-w-2xl">Hairstylist & Lockticienne</p>
-          <button
-            onClick={() => navigate("/reservation")}
-            className="bg-white text-black px-8 py-3 rounded-full font-semibold text-lg hover:bg-opacity-90 transition-all flex items-center gap-2"
+      <div className="min-h-screen bg-white">
+        <Header/>
+
+        {/* Hero Section */}
+        <motion.div
+            initial={{opacity: 0, y: -20}}
+            animate={{opacity: 1, y: 0}}
+            transition={{duration: 1}}
+            className="relative h-[100vh] bg-cover bg-center"
+            style={{
+              backgroundImage:
+                  'url("https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80")',
+            }}
+        >
+          <div className="absolute inset-0 bg-black bg-opacity-50"/>
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-white px-4">
+            <motion.h1
+                initial={{opacity: 0, y: 30}}
+                animate={{opacity: 1, y: 0}}
+                transition={{delay: 0.3, duration: 0.8}}
+                className="text-5xl md:text-6xl font-bold mb-6 text-center"
+            >
+              KAYDIDI
+            </motion.h1>
+            <motion.p
+                initial={{opacity: 0, y: 30}}
+                animate={{opacity: 1, y: 0}}
+                transition={{delay: 0.5, duration: 0.8}}
+                className="text-xl md:text-2xl mb-8 text-center max-w-2xl"
+            >
+              Hairstylist & Lockticienne
+            </motion.p>
+            <motion.div
+                initial={{opacity: 0, scale: 0.8}}
+                animate={{opacity: 1, scale: 1}}
+                transition={{delay: 0.7, duration: 0.5}}
+            >
+              <ReservationButton/>
+            </motion.div>
+          </div>
+        </motion.div>
+
+        {/* Carousel Section */}
+        <motion.section
+            initial={{opacity: 0, y: 50}}
+            whileInView={{opacity: 1, y: 0}}
+            viewport={{once: true}}
+            transition={{duration: 0.8}}
+            className="py-16"
+        >
+          <div className=" relative  mx-auto">
+            <div className="py-12 max-w-3xl mx-auto text-center">
+              <h2 className="text-3xl font-bold mb-8">Nos réalisations</h2>
+            </div>
+            <Swiper
+                modules={[Parallax, Autoplay]}
+                autoplay={{ delay: 3000, disableOnInteraction: false }}
+                speed={800}
+                spaceBetween={-20}
+                loop={true}
+                slidesPerView={1.5}
+                centeredSlides={true}
+                parallax={true}
+                onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
+                className="w-full h-[700px] rounded-lg"
+            >
+              {images.map((src, index) => (
+                  <SwiperSlide key={index} className="relative flex justify-center rounded-lg">
+                    <div
+                        className={`relative w-[90%] h-[90%] overflow-hidden rounded-lg shadow-lg transition-all duration-700 ease-in-out ${
+                            index === activeIndex
+                                ? "scale-110 filter-none"
+                                : "scale-90  filter grayscale brightness-75"
+                        }`}
+                        style={{
+                          transformOrigin: "center",
+                          willChange: "transform, filter",
+                        }}
+                    >
+                      <img
+                          src={src}
+                          alt={`Slide ${index}`}
+                          className="object-cover w-full h-full rounded-lg"
+                      />
+                    </div>
+                  </SwiperSlide>
+              ))}
+            </Swiper>
+
+          </div>
+        </motion.section>
+
+          {/* About Section */}
+          <motion.section
+              initial={{opacity: 0, y: 50}}
+              whileInView={{opacity: 1, y: 0}}
+              viewport={{once: true}}
+              transition={{duration: 0.8}}
+              className="py-16"
           >
-            <Calendar className="w-5 h-5" />
-            Réserver maintenant
-          </button>
-        </div>
+            <div className="container mx-auto px-4">
+              <div className="max-w-3xl mx-auto text-center">
+                <h2 className="text-3xl font-bold mb-8">Notre Histoire</h2>
+                <p className="text-lg text-gray-600 leading-relaxed">
+                  Depuis 2010, notre salon s'engage à offrir des services de coiffure exceptionnels dans une ambiance
+                  chaleureuse et accueillante. Notre équipe de professionnels passionnés combine expertise technique et
+                  créativité pour révéler votre beauté naturelle.
+                </p>
+              </div>
+            </div>
+          </motion.section>
+
+          {/* Contact Section */}
+          <motion.section
+              initial={{opacity: 0, y: 50}}
+              whileInView={{opacity: 1, y: 0}}
+              viewport={{once: true}}
+              transition={{duration: 0.8}}
+              className="py-16 bg-gray-50"
+              id="contact"
+          >
+            <div className="container mx-auto px-4">
+              <h2 className="text-3xl font-bold text-center mb-12">Nous Contacter</h2>
+              <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                <div className="space-y-6">
+                  <motion.div
+                      initial={{opacity: 0, x: -50}}
+                      whileInView={{opacity: 1, x: 0}}
+                      viewport={{once: true}}
+                      transition={{duration: 0.6}}
+                      className="flex items-center gap-4"
+                  >
+                    <MapPin className="w-6 h-6 text-gray-600"/>
+                    <div>
+                      <h3 className="font-semibold">Adresse</h3>
+                      <p className="text-gray-600">123 Rue de la Coiffure, 75001 Paris</p>
+                    </div>
+                  </motion.div>
+                  <motion.div
+                      initial={{opacity: 0, x: -50}}
+                      whileInView={{opacity: 1, x: 0}}
+                      viewport={{once: true}}
+                      transition={{duration: 0.6, delay: 0.2}}
+                      className="flex items-center gap-4"
+                  >
+                    <Phone className="w-6 h-6 text-gray-600"/>
+                    <div>
+                      <h3 className="font-semibold">Téléphone</h3>
+                      <p className="text-gray-600">01 23 45 67 89</p>
+                    </div>
+                  </motion.div>
+                  <motion.div
+                      initial={{opacity: 0, x: -50}}
+                      whileInView={{opacity: 1, x: 0}}
+                      viewport={{once: true}}
+                      transition={{duration: 0.6, delay: 0.4}}
+                      className="flex items-center gap-4"
+                  >
+                    <Mail className="w-6 h-6 text-gray-600"/>
+                    <div>
+                      <h3 className="font-semibold">Email</h3>
+                      <p className="text-gray-600">contact@salondecoiffure.fr</p>
+                    </div>
+                  </motion.div>
+                  <motion.div
+                      initial={{opacity: 0, x: -50}}
+                      whileInView={{opacity: 1, x: 0}}
+                      viewport={{once: true}}
+                      transition={{duration: 0.6, delay: 0.6}}
+                      className="flex gap-4 pt-4"
+                  >
+                    <a href="#" className="text-gray-600 hover:text-gray-900">
+                      <Instagram className="w-6 h-6"/>
+                    </a>
+                    <a href="#" className="text-gray-600 hover:text-gray-900">
+                      <Facebook className="w-6 h-6"/>
+                    </a>
+                  </motion.div>
+                </div>
+                <motion.div
+                    initial={{opacity: 0, scale: 0.9}}
+                    whileInView={{opacity: 1, scale: 1}}
+                    viewport={{once: true}}
+                    transition={{duration: 0.6}}
+                    className="h-[300px] bg-gray-200 rounded-lg flex items-center justify-center text-gray-500"
+                >
+                  Carte Interactive
+                </motion.div>
+              </div>
+            </div>
+          </motion.section>
       </div>
-
-      {/* Carousel Section */}
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">Nos Réalisations</h2>
-          <ImageCarousel />
-        </div>
-      </section>
-
-      {/* About Section */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl font-bold mb-8">Notre Histoire</h2>
-            <p className="text-lg text-gray-600 leading-relaxed">
-              Depuis 2010, notre salon s'engage à offrir des services de coiffure exceptionnels dans une ambiance chaleureuse et accueillante. Notre équipe de
-              professionnels passionnés combine expertise technique et créativité pour révéler votre beauté naturelle.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Contact Section */}
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">Nous Contacter</h2>
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <div className="space-y-6">
-              <div className="flex items-center gap-4">
-                <MapPin className="w-6 h-6 text-gray-600" />
-                <div>
-                  <h3 className="font-semibold">Adresse</h3>
-                  <p className="text-gray-600">123 Rue de la Coiffure, 75001 Paris</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-4">
-                <Phone className="w-6 h-6 text-gray-600" />
-                <div>
-                  <h3 className="font-semibold">Téléphone</h3>
-                  <p className="text-gray-600">01 23 45 67 89</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-4">
-                <Mail className="w-6 h-6 text-gray-600" />
-                <div>
-                  <h3 className="font-semibold">Email</h3>
-                  <p className="text-gray-600">contact@salondecoiffure.fr</p>
-                </div>
-              </div>
-              <div className="flex gap-4 pt-4">
-                <a href="#" className="text-gray-600 hover:text-gray-900">
-                  <Instagram className="w-6 h-6" />
-                </a>
-                <a href="#" className="text-gray-600 hover:text-gray-900">
-                  <Facebook className="w-6 h-6" />
-                </a>
-              </div>
-            </div>
-            <div className="h-[300px] bg-gray-200 rounded-lg">
-              {/* Map placeholder - Would be replaced with actual map integration */}
-              <div className="w-full h-full flex items-center justify-center text-gray-500">Carte Interactive</div>
-            </div>
-          </div>
-        </div>
-      </section>
-    </div>
-  );
+);
 }
 
 export default Home;

@@ -12,7 +12,7 @@ function App() {
       <Route path="/" element={<Home />} />
       <Route path="/reservation" element={<Reservation />} />
       <Route path="/success" element={<BookingSuccess />} />
-      <Route path="/slotNotAvailable" element={<SlotNotAvailable />} />
+      <Route path="/slot-not-available" element={<SlotNotAvailable />} />
       <Route path="/cancel/:id" element={<Cancel />} />
     </Routes>
 

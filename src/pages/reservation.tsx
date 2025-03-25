@@ -8,9 +8,7 @@ import { PaymentStep } from "../components/PaymentStep";
 // import { services } from "./data/services";
 import { BookingSelection, BookingStep, SubPrestation, UserInfo } from "../types/booking";
 import { LogIn, Scissors, UserPlus } from "lucide-react";
-import { QueryClient, QueryClientProvider, useQuery, useQueryClient } from "react-query";
 import prestationService from "../services/prestationService";
-import { BrowserRouter, Routes, Route } from "react-router";
 import daysOfWeekService from "../services/daysOfWeekService";
 import clientService from "../services/clientService";
 import { UserLoginForm } from "../components/UserLoginForm";
@@ -45,9 +43,6 @@ function Reservation() {
     const fetchData = async () => {
       try {
         await Promise.all([prestationService.getPrestations(), daysOfWeekService.getAll()]).then(([prestations, daysOfWeek]) => {
-          console.log("prestations", prestations);
-          console.log("daysOfWeek", daysOfWeek);
-
           setServices(prestations.data.prestation);
           setDaysOfWeek(daysOfWeek.data.daysOfWeek);
         });
@@ -287,6 +282,7 @@ function Reservation() {
                           <p className="text-sm text-gray-600 text-center mt-2">
                             Un email vous a été envoyé pour valider votre compte. Veuillez entrer le code reçu par email.
                           </p>
+                          <p>Pensez à vérifier vos spams.</p>
                           {error && <div className="bg-red-50 text-red-600 p-4 rounded-lg mt-2">{error}</div>}
                           <input
                             type="text"

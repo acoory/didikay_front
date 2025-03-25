@@ -166,7 +166,6 @@ export function DatePicker({ selectedDate, selectedTime, onDateSelect, onTimeSel
 
               const disabled = isDateDisabled(date) || isClosedDay(date); // Vérifie si la date est fermée
               const selected = isDateSelected(date);
-              const dayName = moment(date).locale("fr").format("dddd"); // Ex: "l
 
               return (
                 <button
@@ -225,7 +224,13 @@ export function DatePicker({ selectedDate, selectedTime, onDateSelect, onTimeSel
                   `}
                 >
                   {formatTime(slot.start)}
-                  {slot.busy && <span className="block text-xs text-gray-500">Indisponible</span>}
+                  {!slot.vaccation && slot.busy && (
+                      <span className="block text-xs text-gray-500">Indisponible</span>
+                  )}
+                  {slot.vaccation && (
+                      <span className="block text-xs text-gray-500">En congé</span>
+                  )}
+
                 </button>
               ))}
             </div>
