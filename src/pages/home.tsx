@@ -180,7 +180,7 @@ function Home() {
                     <MapPin className="w-6 h-6 text-gray-600"/>
                     <div>
                       <h3 className="font-semibold">Adresse</h3>
-                      <p className="text-gray-600">123 Rue de la Coiffure, 75001 Paris</p>
+                      <p className="text-gray-600">49 boulevard de paris, 13002 Marseille</p>
                     </div>
                   </motion.div>
                   <motion.div
@@ -191,10 +191,10 @@ function Home() {
                       className="flex items-center gap-4"
                   >
                     <Phone className="w-6 h-6 text-gray-600"/>
-                    <div>
-                      <h3 className="font-semibold">Téléphone</h3>
-                      <p className="text-gray-600">01 23 45 67 89</p>
-                    </div>
+                    {/*<div>*/}
+                    {/*  <h3 className="font-semibold">Téléphone</h3>*/}
+                    {/*  <p className="text-gray-600"></p>*/}
+                    {/*</div>*/}
                   </motion.div>
                   <motion.div
                       initial={{opacity: 0, x: -50}}
@@ -204,24 +204,10 @@ function Home() {
                       className="flex items-center gap-4"
                   >
                     <Mail className="w-6 h-6 text-gray-600"/>
-                    <div>
-                      <h3 className="font-semibold">Email</h3>
-                      <p className="text-gray-600">contact@salondecoiffure.fr</p>
-                    </div>
-                  </motion.div>
-                  <motion.div
-                      initial={{opacity: 0, x: -50}}
-                      whileInView={{opacity: 1, x: 0}}
-                      viewport={{once: true}}
-                      transition={{duration: 0.6, delay: 0.6}}
-                      className="flex gap-4 pt-4"
-                  >
-                    <a href="#" className="text-gray-600 hover:text-gray-900">
-                      <Instagram className="w-6 h-6"/>
-                    </a>
-                    <a href="#" className="text-gray-600 hover:text-gray-900">
-                      <Facebook className="w-6 h-6"/>
-                    </a>
+                    {/*<div>*/}
+                    {/*  <h3 className="font-semibold">Email</h3>*/}
+                    {/*  <p className="text-gray-600">contact@salondecoiffure.fr</p>*/}
+                    {/*</div>*/}
                   </motion.div>
                 </div>
                 <motion.div

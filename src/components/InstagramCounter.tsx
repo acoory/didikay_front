@@ -35,7 +35,7 @@ export const InstagramCounter: React.FC<InstagramCounterProps> = ({ scrolled, fo
 
     return (
         <a
-            href="https://www.instagram.com/kaydidi"
+            href="https://www.instagram.com/_kaydidi_"
             target="_blank"
             rel="noopener noreferrer"
             className={`group flex items-center gap-2 transition-transform transform hover:scale-110 ${
