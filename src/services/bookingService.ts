@@ -9,7 +9,9 @@ export class BookingService extends Api {
   }
 
   async cancelBooking(code: string, bookingId: string | undefined) {
-    return this.instance.delete(`/client/booking/cancel/${bookingId}/${code}`);
+    return this.instance.post(`/client/booking/cancel/${bookingId}`, {
+        code: code,
+    });
   }
 }
 export default new BookingService();
