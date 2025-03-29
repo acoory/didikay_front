@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ChevronLeft, ChevronRight, Clock } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, Calendar } from "lucide-react";
 // import moment from "moment";
 import "moment/locale/fr";
 import { TimeSlot } from "../types/booking";
@@ -139,15 +139,24 @@ export function DatePicker({ selectedDate, selectedTime, onDateSelect, onTimeSel
   };
 
   return (
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white rounded-lg shadow-md p-6 transition-all duration-300">
         {!showTimeSlots ? (
-            <>
+            <div className="space-y-6 animate-fadeIn">
               <div className="flex items-center justify-between mb-4">
-                <button onClick={handlePreviousMonth} className="p-2 hover:bg-gray-100 rounded-full">
+                <button 
+                  onClick={handlePreviousMonth} 
+                  className="p-2 hover:bg-[#ec7f2b26] rounded-full transition-colors duration-200 text-[#e86126]"
+                >
                   <ChevronLeft className="w-5 h-5"/>
                 </button>
-                <h3 className="text-lg font-semibold capitalize">{formatMonth()}</h3>
-                <button onClick={handleNextMonth} className="p-2 hover:bg-gray-100 rounded-full">
+                <h3 className="text-lg font-semibold capitalize flex items-center">
+                  <Calendar className="w-5 h-5 mr-2 text-[#e86126]" />
+                  {formatMonth()}
+                </h3>
+                <button 
+                  onClick={handleNextMonth} 
+                  className="p-2 hover:bg-[#ec7f2b26] rounded-full transition-colors duration-200 text-[#e86126]"
+                >
                   <ChevronRight className="w-5 h-5"/>
                 </button>
               </div>
@@ -166,6 +175,7 @@ export function DatePicker({ selectedDate, selectedTime, onDateSelect, onTimeSel
 
                   const disabled = isDateDisabled(date) || isClosedDay(date);
                   const selected = isDateSelected(date);
+                  const isToday = moment(date).isSame(moment(), 'day');
 
                   return (
                       <button
@@ -173,30 +183,39 @@ export function DatePicker({ selectedDate, selectedTime, onDateSelect, onTimeSel
                           onClick={() => !disabled && handleDateClick(date)}
                           disabled={disabled}
                           className={`
-                p-2 rounded-full text-sm
-                ${disabled ? "text-gray-300 cursor-not-allowed" : "hover:bg-[#ec7f2b26]"}
-                ${selected ? "bg-[#e86126] text-white hover:bg-[#ec7f2b]" : ""}
-              `}
+                            p-2 rounded-full text-sm relative transition-all duration-200
+                            ${disabled ? "text-gray-300 cursor-not-allowed" : "hover:bg-[#ec7f2b26] hover:scale-110"}
+                            ${isToday && !selected ? "border border-[#e86126] text-[#e86126]" : ""}
+                            ${selected ? "bg-[#e86126] text-white hover:bg-[#ec7f2b]" : ""}
+                          `}
                       >
                         {moment(date).date()}
+                        {isToday && !selected && <span className="sr-only">Aujourd'hui</span>}
                       </button>
                   );
                 })}
               </div>
-            </>
+            </div>
         ) : (
-            <div className="space-y-4">
+            <div className="space-y-4 animate-fadeIn">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <Clock className="w-5 h-5 text-[#e86126]"/>
                   <h3 className="text-lg font-semibold">
-                    Horaires disponibles pour le {formatDate(selectedDate!)}
+                    Horaires disponibles
                   </h3>
                 </div>
-                <button onClick={() => setShowTimeSlots(false)}
-                        className="text-[#e86126] hover:text-[#ec7f2b] font-medium">
-                  ← Changer la date
+                <button 
+                  onClick={() => setShowTimeSlots(false)}
+                  className="text-[#e86126] hover:text-[#ec7f2b] font-medium transition-colors duration-200 flex items-center"
+                >
+                  <ChevronLeft className="w-4 h-4 mr-1" />
+                  Changer la date
                 </button>
+              </div>
+              
+              <div className="bg-[#fdeae1] p-3 rounded-lg mb-4 shadow-sm">
+                <p className="font-medium text-[#e86126] text-center">{formatDate(selectedDate!)}</p>
               </div>
 
               {isLoading && (
@@ -206,40 +225,60 @@ export function DatePicker({ selectedDate, selectedTime, onDateSelect, onTimeSel
                   </div>
               )}
 
-              {error && <div className="bg-red-50 text-red-600 p-4 rounded-lg">{error}</div>}
+              {error && (
+                <div className="bg-red-50 text-red-600 p-4 rounded-lg flex items-center space-x-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                  <span>{error}</span>
+                </div>
+              )}
 
               {!isLoading && !error && (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    {timeSlots.map((slot) => (
-                        <button
-                            key={slot.start_unix}
-                            onClick={() => !slot.busy && onTimeSelect(formatTime(slot.start), slot)}
-                            disabled={slot.busy}
-                            className={`
-                p-3 rounded-lg border text-center transition-all
-                ${
-                                slot.busy
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                    {timeSlots.length === 0 ? (
+                      <div className="col-span-full text-center p-6 bg-gray-50 rounded-lg">
+                        <p className="text-gray-600">Aucun créneau disponible pour cette date.</p>
+                        <button 
+                          onClick={() => setShowTimeSlots(false)}
+                          className="mt-3 text-[#e86126] hover:text-[#ec7f2b] font-medium"
+                        >
+                          Sélectionner une autre date
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        {timeSlots.map((slot) => (
+                          <button
+                              key={slot.start_unix}
+                              onClick={() => !slot.busy && onTimeSelect(formatTime(slot.start), slot)}
+                              disabled={slot.busy}
+                              className={`
+                                p-3 rounded-lg border text-center transition-all duration-200
+                                ${
+                                  slot.busy
                                     ? "bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200"
                                     : selectedTime === formatTime(slot.start)
-                                        ? "bg-[#ec7f2b26] border-[#e86126] text-[#e86126]"
-                                        : "border-gray-200 hover:border-[#ec7f2b] hover:bg-[#ec7f2b26]"
-                            }
-              `}
-                        >
-                          {formatTime(slot.start)}
-                          {!slot.vaccation && slot.busy && (
-                              <span className="block text-xs text-gray-500">Indisponible</span>
-                          )}
-                          {slot.vaccation && (
-                              <span className="block text-xs text-gray-500">En congé</span>
-                          )}
-                        </button>
-                    ))}
+                                      ? "bg-[#ec7f2b26] border-[#e86126] text-[#e86126] transform scale-105 shadow-sm"
+                                      : "border-gray-200 hover:border-[#ec7f2b] hover:bg-[#ec7f2b26] hover:scale-105"
+                                }
+                              `}
+                          >
+                            <span className="text-lg">{formatTime(slot.start)}</span>
+                            {!slot.vaccation && slot.busy && (
+                                <span className="block text-xs text-gray-500 mt-1">Indisponible</span>
+                            )}
+                            {slot.vaccation && (
+                                <span className="block text-xs text-gray-500 mt-1">En congé</span>
+                            )}
+                          </button>
+                        ))}
+                      </>
+                    )}
                   </div>
               )}
             </div>
         )}
       </div>
-
   );
 }

@@ -7,11 +7,12 @@ import { UserForm } from "../components/UserForm";
 import { PaymentStep } from "../components/PaymentStep";
 // import { services } from "./data/services";
 import { BookingSelection, BookingStep, SubPrestation, UserInfo } from "../types/booking";
-import { LogIn, Scissors, UserPlus } from "lucide-react";
+import { LogIn, Scissors, UserPlus, Calendar, CheckCircle, CreditCard } from "lucide-react";
 import prestationService from "../services/prestationService";
 import daysOfWeekService from "../services/daysOfWeekService";
 import clientService from "../services/clientService";
 import { UserLoginForm } from "../components/UserLoginForm";
+import "../styles/animations.css"; // Importer les animations CSS
 
 function Reservation() {
   // const [services, setServices] = useState([]);
@@ -153,189 +154,250 @@ function Reservation() {
     }
   };
 
+  // Définir les étapes pour le stepper
+  const steps = [
+    { id: "services", label: "Services", icon: <Scissors className="w-5 h-5" /> },
+    { id: "date", label: "Date & Heure", icon: <Calendar className="w-5 h-5" /> },
+    { id: "info", label: "Informations", icon: <UserPlus className="w-5 h-5" /> },
+    { id: "payment", label: "Paiement", icon: <CreditCard className="w-5 h-5" /> },
+  ];
+
   return (
-      <div className="min-h-screen bg-gray-50">
-        <header className="bg-white shadow-sm">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div className="flex items-center space-x-3">
-              <Scissors className="h-8 w-8 text-[#e86126]"/>
-              <h1 className="text-2xl font-bold text-gray-900">✨ Salon de Coiffure</h1>
-            </div>
-          </div>
-        </header>
+    <div className="bg-gray-50 min-h-screen">
+      <div className="max-w-7xl mx-auto px-4 py-8 md:px-6 lg:px-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Réservation</h1>
+          <p className="text-gray-600">Réservez votre rendez-vous en quelques clics</p>
+        </div>
 
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <Stepper currentStep={currentStep}/>
+        {/* Stepper */}
+        <div className="mb-8">
+          <Stepper steps={steps} currentStep={currentStep} />
+        </div>
+        
+        <main className="bg-white rounded-xl shadow-sm overflow-hidden p-6 mb-10">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2 space-y-8">
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
-            <div className="lg:col-span-2">
               {currentStep === "services" && (
-                  <>
-                    <h2 className="text-xl font-semibold mb-4">
-                      {!selection.prestationId ? "✂️ Choisissez votre prestation" : "🎨 Sélectionnez vos services"}
-                    </h2>
-                    <ServiceSelection services={services} selection={selection} onSelect={setSelection}
-                                      setDevis={setDevis} devis={devis}/>
-                    {canProceedToDate() && (
-                        <div className="mt-6">
-                          <button
-                              onClick={handleNext}
-                              className="w-full sm:w-auto px-6 py-3 bg-[#e86126] text-white font-medium rounded-lg hover:bg-[#ec7f2b] transition-colors"
-                          >
-                            Suivant →
-                          </button>
-                        </div>
-                    )}
-                  </>
+                <div className="animate-fadeIn">
+                  <h2 className="text-xl font-semibold mb-6 flex items-center">
+                    <Scissors className="w-5 h-5 mr-2 text-[#e86126]" />
+                    <span>Choisissez vos services</span>
+                  </h2>
+                  <ServiceSelection services={services} selection={selection} onSelect={setSelection} setDevis={setDevis} devis={devis} />
+                  
+                  {canProceedToDate() && (
+                    <div className="mt-8 flex justify-end">
+                      <button
+                        onClick={handleNext}
+                        className="px-6 py-3 bg-[#e86126] text-white font-medium rounded-lg hover:bg-[#ec7f2b] transition-colors flex items-center space-x-2"
+                      >
+                        <span>Continuer vers la date</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                        </svg>
+                      </button>
+                    </div>
+                  )}
+                </div>
               )}
 
               {currentStep === "date" && (
-                  <>
-                    <div className="flex items-center justify-between mb-4">
-                      <h2 className="text-xl font-semibold">📅 Choisissez une date et heure</h2>
-                      <button onClick={handleBack} className="text-[#e86126] hover:text-[#ec7f2b] font-medium">
-                        ← Retour
+                <div className="animate-fadeIn">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-xl font-semibold flex items-center">
+                      <Calendar className="w-5 h-5 mr-2 text-[#e86126]" />
+                      <span>Choisissez une date et heure</span>
+                    </h2>
+                    <button 
+                      onClick={handleBack} 
+                      className="text-[#e86126] hover:text-[#ec7f2b] font-medium flex items-center"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      Retour
+                    </button>
+                  </div>
+                  <DatePicker
+                    selectedDate={selection.selectedDate as Date}
+                    selectedTime={selection.selectedTime as string}
+                    onDateSelect={handleDateSelect}
+                    onTimeSelect={handleTimeSelect as any}
+                    selection={selection}
+                    services={services}
+                    daysOfWeek={daysOfWeek}
+                  />
+                  {selection.selectedDate && selection.selectedTime && (
+                    <div className="mt-8 flex justify-end">
+                      <button
+                        onClick={handleNext}
+                        className="px-6 py-3 bg-[#e86126] text-white font-medium rounded-lg hover:bg-[#ec7f2b] transition-colors flex items-center space-x-2"
+                      >
+                        <span>Continuer vers vos informations</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                        </svg>
                       </button>
                     </div>
-                    <DatePicker
-                        selectedDate={selection.selectedDate as Date}
-                        selectedTime={selection.selectedTime as string}
-                        onDateSelect={handleDateSelect}
-                        onTimeSelect={handleTimeSelect as any}
-                        selection={selection}
-                        services={services}
-                        daysOfWeek={daysOfWeek}
-                    />
-                    {selection.selectedDate && selection.selectedTime && (
-                        <div className="mt-6">
-                          <button
-                              onClick={handleNext}
-                              className="w-full sm:w-auto px-6 py-3 bg-[#e86126] text-white font-medium rounded-lg hover:bg-[#ec7f2b] transition-colors"
-                          >
-                            Suivant →
-                          </button>
-                        </div>
-                    )}
-                  </>
+                  )}
+                </div>
               )}
 
               {currentStep === "info" && (
-                  <>
-                    <div className="flex items-center justify-between mb-4">
-                      <h2 className="text-xl font-semibold">👤 Vos informations</h2>
-                      <button onClick={handleBack} className="text-[#e86126] hover:text-[#ec7f2b] font-medium">
-                        ← Retour
+                <div className="animate-fadeIn">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-xl font-semibold flex items-center">
+                      <UserPlus className="w-5 h-5 mr-2 text-[#e86126]" />
+                      <span>Vos informations</span>
+                    </h2>
+                    <button 
+                      onClick={handleBack} 
+                      className="text-[#e86126] hover:text-[#ec7f2b] font-medium flex items-center"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      Retour
+                    </button>
+                  </div>
+
+                  <div className="bg-white rounded-lg shadow-sm border border-gray-100">
+                    <div className="mb-6 flex border-b">
+                      <button
+                        onClick={() => setAccountType("create")}
+                        className={`flex-1 py-3 px-4 text-center font-medium ${
+                          accountType === "create"
+                            ? "text-[#e86126] border-b-2 border-[#e86126]"
+                            : "text-gray-500 hover:text-gray-700"
+                        }`}
+                      >
+                        <span className="flex items-center justify-center">
+                          <UserPlus size={18} className="mr-2" />
+                          Nouveau client
+                        </span>
+                      </button>
+                      <button
+                        onClick={() => setAccountType("login")}
+                        className={`flex-1 py-3 px-4 text-center font-medium ${
+                          accountType === "login"
+                            ? "text-[#e86126] border-b-2 border-[#e86126]"
+                            : "text-gray-500 hover:text-gray-700"
+                        }`}
+                      >
+                        <span className="flex items-center justify-center">
+                          <LogIn size={18} className="mr-2" />
+                          Déjà client
+                        </span>
                       </button>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4 mb-8">
-                      <button
-                          onClick={() => setAccountType("create")}
-                          className={`flex flex-col items-center justify-center p-4 rounded-lg transition-all duration-200 ${
-                              accountType === "create" ? "bg-[#e8612630] text-[#e86126] ring-2 ring-[#ec7f2b]" : "bg-gray-50 text-gray-600 hover:bg-gray-100"
-                          }`}
-                      >
-                        <UserPlus size={24} className="mb-2"/>
-                        <span className="font-medium text-sm">Créer un compte</span>
-                      </button>
-
-                      <button
-                          onClick={() => setAccountType("login")}
-                          className={`flex flex-col items-center justify-center p-4 rounded-lg transition-all duration-200 ${
-                              accountType === "login" ? "bg-[#ec7f2b30] text-[#ec7f2b] ring-2 ring-[#e86126]" : "bg-gray-50 text-gray-600 hover:bg-gray-100"
-                          }`}
-                      >
-                        <LogIn size={24} className="mb-2"/>
-                        <span className="font-medium text-sm">J'ai déjà un compte</span>
-                      </button>
-                    </div>
-
-                    <div className="p-4 rounded-lg bg-white border border-gray-200">
+                    <div className="p-6">
                       {accountType === "create" ? (
-                          <>
-                            {!is_active_otp ? (
-                                <div className="flex flex-col">
-                                  <div className="flex items-center space-x-3 text-[#e86126]">
-                                    <UserPlus size={20}/>
-                                    <span className="font-medium">Créer un nouveau compte</span>
-                                  </div>
-                                  {error &&
-                                      <div className="bg-red-50 text-red-600 p-4 rounded-lg mb-4 mt-2">{error}</div>}
-                                  <UserForm userInfo={userInfo} onUserInfoChange={setUserInfo}/>
-                                  <div className="mt-6">
-                                    <button
-                                        disabled={loading}
-                                        onClick={handleCreateAccount}
-                                        style={{
-                                          cursor: loading ? "not-allowed" : "pointer",
-                                          backgroundColor: loading ? "gray" : undefined,
-                                        }}
-                                        className="w-full sm:w-auto px-6 py-3 bg-[#e86126] text-white font-medium rounded-lg hover:bg-[#ec7f2b] transition-colors"
-                                    >
-                                      {loading ? (
-                                          <div
-                                              className="animate-spin ml-2 h-5 w-5 border-t-2 border-b-2 border-white rounded-full"></div>
-                                      ) : (
-                                          "Créer le compte et continuer →"
-                                      )}
-                                    </button>
-                                  </div>
+                        <>
+                          {!is_active_otp ? (
+                            <div className="space-y-6">
+                              {error && (
+                                <div className="bg-red-50 text-red-600 p-4 rounded-lg mb-4 flex items-center space-x-2">
+                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                                  </svg>
+                                  <span>{error}</span>
                                 </div>
-                            ) : (
-                                <div className="flex flex-col items-center">
-                                  <h2 className="text-lg font-semibold text-gray-800 text-center">Vérification de votre
-                                    compte</h2>
-                                  <p className="text-sm text-gray-600 text-center mt-2">
-                                    Un email vous a été envoyé pour valider votre compte. Veuillez entrer le code reçu
-                                    par email.
-                                  </p>
-                                  {error && <div className="bg-red-50 text-red-600 p-4 rounded-lg mt-2">{error}</div>}
-                                  <input
-                                      type="text"
-                                      value={otp_code}
-                                      onChange={(e) => setOtp_code(e.target.value)}
-                                      className="mt-4 px-4 py-2 border rounded-md w-full text-center text-lg tracking-widest focus:border-[#e86126] focus:ring-[#ec7f2b]"
-                                      placeholder="123456"
-                                      maxLength={6}
-                                  />
-                                  <button
-                                      disabled={loading}
-                                      onClick={handleSubmitOtp}
-                                      className="mt-4 bg-[#e86126] text-white px-4 py-2 rounded-md w-full font-semibold hover:bg-[#ec7f2b] transition"
-                                  >
-                                    {loading ? <div
-                                        className="animate-spin ml-2 h-5 w-5 border-t-2 border-b-2 border-white rounded-full"></div> : "Valider le code"}
-                                  </button>
-                                </div>
-                            )}
-                          </>
-                      ) : (
-                          <div className="flex flex-col">
-                            <div className="flex items-center space-x-3 text-[#ec7f2b]">
-                              <LogIn size={20}/>
-                              <span className="font-medium">Se connecter</span>
+                              )}
+                              <UserForm userInfo={userInfo} onUserInfoChange={setUserInfo}/>
+                              <div className="flex justify-end">
+                                <button
+                                  disabled={loading}
+                                  onClick={handleCreateAccount}
+                                  className={`px-6 py-3 text-white font-medium rounded-lg transition-colors flex items-center space-x-2 ${
+                                    loading ? "bg-gray-400 cursor-not-allowed" : "bg-[#e86126] hover:bg-[#ec7f2b]"
+                                  }`}
+                                >
+                                  {loading ? (
+                                    <>
+                                      <div className="animate-spin h-5 w-5 border-2 border-t-transparent border-white rounded-full mr-2"></div>
+                                      <span>Traitement...</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <span>Créer et continuer</span>
+                                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                                      </svg>
+                                    </>
+                                  )}
+                                </button>
+                              </div>
                             </div>
-                            <UserLoginForm userInfo={userInfo} onUserInfoChange={setUserInfo}
-                                           setCurrentStep={setCurrentStep}/>
-                          </div>
+                          ) : (
+                            <div className="space-y-4">
+                              <div className="bg-green-50 text-green-700 p-4 rounded-lg mb-4 flex items-center">
+                                <CheckCircle className="h-5 w-5 mr-2" />
+                                <div>
+                                  <h3 className="font-medium">Compte créé avec succès!</h3>
+                                  <p className="text-sm">Un code de vérification a été envoyé à votre email.</p>
+                                </div>
+                              </div>
+                              <div className="mb-4">
+                                <label className="block text-gray-700 font-medium mb-2">
+                                  Code de vérification
+                                </label>
+                                <input 
+                                  type="text" 
+                                  value={otp_code}
+                                  onChange={(e) => setOtp_code(e.target.value)}
+                                  placeholder="Entrez le code reçu par email"
+                                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-[#e86126] focus:border-[#e86126] outline-none transition-colors"
+                                />
+                              </div>
+                              <div className="flex justify-end">
+                                <button 
+                                  onClick={handleSubmitOtp}
+                                  className="px-6 py-3 bg-[#e86126] text-white font-medium rounded-lg hover:bg-[#ec7f2b] transition-colors flex items-center space-x-2"
+                                >
+                                  <span>Continuer vers le paiement</span>
+                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                                  </svg>
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        <div className="space-y-6">
+                          <UserLoginForm userInfo={userInfo} onUserInfoChange={setUserInfo} setCurrentStep={setCurrentStep}/>
+                        </div>
                       )}
                     </div>
-                  </>
+                  </div>
+                </div>
               )}
+              
               {currentStep === "payment" && (
-                  <>
-                    <div className="flex items-center justify-between mb-4">
-                      <h2 className="text-xl font-semibold">💳 Paiement</h2>
-                      <button onClick={handleBack} className="text-[#e86126] hover:text-[#ec7f2b] font-medium">
-                        ← Retour
-                      </button>
-                    </div>
-                    <PaymentStep userInfo={userInfo} selection={selection} devis={devis} />
-                  </>
+                <div className="animate-fadeIn">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-xl font-semibold flex items-center">
+                      <CreditCard className="w-5 h-5 mr-2 text-[#e86126]" />
+                      <span>Paiement</span>
+                    </h2>
+                    <button 
+                      onClick={handleBack} 
+                      className="text-[#e86126] hover:text-[#ec7f2b] font-medium flex items-center"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      Retour
+                    </button>
+                  </div>
+                  <PaymentStep userInfo={userInfo} selection={selection} devis={devis} />
+                </div>
               )}
 
             </div>
-
 
             <div className="lg:col-span-1">
               <BookingSummary services={services} selection={selection} userInfo={userInfo}/>
@@ -343,7 +405,7 @@ function Reservation() {
           </div>
         </main>
       </div>
-
+    </div>
   );
 }
 
