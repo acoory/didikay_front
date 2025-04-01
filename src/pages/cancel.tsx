@@ -29,20 +29,21 @@ export default function Cancel() {
 
     setTimeout(async () => {
       try {
-        await bookingService.cancelBooking(code, id).then((res) => {
+        const response = await bookingService.cancelBooking(code, id);
+        if (response.status === 200) {
           setStatus({
             isValid: true,
             message: "Réservation annulée avec succès",
             isLoading: false,
           });
-        });
-      } catch (e) {
+        }
+      } catch (error) {
+        console.error("Error canceling booking:", error);
         setStatus({
           isValid: false,
           message: "Code invalide. Veuillez vérifier votre code et réessayer.",
           isLoading: false,
         });
-        console.log(e);
       }
     }, 1000);
   };

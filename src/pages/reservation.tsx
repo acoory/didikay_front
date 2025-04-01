@@ -100,56 +100,23 @@ function Reservation() {
 
   const handleCreateAccount = async () => {
     try {
-      setLoading(true);
-      if (userInfo.firstname.trim() === "" || userInfo.lastname.trim() === "" || userInfo.email.trim() === "") {
-        setError("Veuillez remplir les champs obligatoires.");
-        setLoading(false);
-        return;
+      const res = await clientService.createAccount(userInfo);
+      if (res.status === 200) {
+        setCurrentStep("payment");
       }
-
-      await clientService.create(userInfo).then((res) => {
-        console.log("Account created:", res);
-      });
-
-      setError(null);
-      setIs_active_otp(true);
-      setLoading(false);
-      console.log("Account created:", userInfo);
     } catch (error) {
       console.error("Error creating account:", error);
-      setError("Un compte avec cet email existe déjà.");
-      setLoading(false);
     }
   };
 
-  const handleSubmitOtp = async () => {
+  const handleSubmitOTP = async () => {
     try {
-      setLoading(true);
-      console.log("Submitting OTP code...");
-      if (otp_code.trim() === "") {
-        setError("Veuillez entrer le code reçu par email.");
-        setLoading(false);
-        return;
+      const res = await clientService.verifyOTP(userInfo.email, otpCode);
+      if (res.status === 200) {
+        setCurrentStep("payment");
       }
-
-      const req = await clientService
-        .verifyOtp({
-          email: userInfo.email,
-          otp: otp_code,
-        })
-        .then((res) => {
-          console.log("OTP verified:", res);
-          // if (res.data.status === 200) {
-          setCurrentStep("payment");
-          setLoading(false);
-          // } else {
-          //   setError("Code OTP invalide.");
-          // }
-        });
     } catch (error) {
       console.error("Error submitting OTP:", error);
-      setError("Code invalide.");
-      setLoading(false);
     }
   };
 
@@ -300,7 +267,7 @@ function Reservation() {
                                   />
                                   <button
                                       disabled={loading}
-                                      onClick={handleSubmitOtp}
+                                      onClick={handleSubmitOTP}
                                       className="mt-4 bg-[#e86126] text-white px-4 py-2 rounded-md w-full font-semibold hover:bg-[#ec7f2b] transition"
                                   >
                                     {loading ? <div

@@ -1,6 +1,7 @@
 import React from "react";
 import { UserInfo } from "../types/booking";
-import { EyeIcon, EyeOffIcon } from "lucide-react";
+import { EyeIcon, EyeOffIcon, Mail } from "lucide-react";
+import { useNavigate } from "react-router";
 
 interface UserFormProps {
   userInfo: UserInfo;
@@ -8,6 +9,7 @@ interface UserFormProps {
 }
 
 export function UserForm({ userInfo, onUserInfoChange }: UserFormProps) {
+  const navigate = useNavigate();
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     onUserInfoChange({

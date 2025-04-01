@@ -5,7 +5,24 @@ import stripeService from "../services/stripeService";
 export function PaymentStep(props: any) {
   const { userInfo, selection, devis } = props;
 
-  console.log("devis", devis);
+
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const redirect = await stripeService.createPayment({
+        formData: userInfo,
+        devis: devis,
+        booking: selection.slot,
+      });
+      // window.open(redirect.data.url, "_blank");
+      window.location.href = redirect.data.url;
+
+
+    } catch (error) {
+      console.error("Error processing payment:", error);
+    }
+  };
 
   return (
       <div className="bg-white rounded-lg shadow-md p-6">
@@ -18,19 +35,7 @@ export function PaymentStep(props: any) {
           </div>
 
           <button
-              onClick={async () => {
-                  const redirect = await stripeService.createPayment({
-                      formData: userInfo,
-                      devis: devis,
-                      booking: selection.slot,
-                  });
-                  // window.open(redirect.data.url, "_blank");
-                  window.location.href = redirect.data.url;
-
-                  console.log("devis", devis);
-                  console.log("selection", selection);
-                  console.log("userInfo", userInfo);
-              }}
+              onClick={handleSubmit}
               className="w-full bg-[#e86126] text-white py-4 px-6 rounded-lg font-medium flex items-center justify-center space-x-2 hover:bg-[#ec7f2b] transition-colors"
           >
               <CreditCard className="h-5 w-5"/>

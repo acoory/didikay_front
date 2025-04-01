@@ -46,6 +46,32 @@ export function ServiceSelection({ services, selection, onSelect, setDevis, devi
     }
   };
 
+  const getSelectedServices = () => {
+    if (!selection.prestationId) return [];
+
+    const selectedServices: Array<{
+      name: string;
+      price: string;
+      duration_minutes: number;
+      description: string;
+    }> = [];
+
+    const selectedPrestation = services.find((p) => p.id === selection.prestationId);
+    if (!selectedPrestation) return [];
+
+    selectedPrestation.subprestations.forEach((subPrestation) => {
+      const selectedServiceId = selection.subPrestationSelections[subPrestation.id];
+      if (selectedServiceId) {
+        const service = subPrestation.services.find((s) => s.id === selectedServiceId);
+        if (service) {
+          selectedServices.push(service);
+        }
+      }
+    });
+
+    return selectedServices;
+  };
+
   if (!selection.prestationId) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { UserInfo } from "../types/booking";
 import clientService from "../services/clientService";
+import { Link } from "react-router";
 
 interface LoginFormProps {
   userInfo: UserInfo;
@@ -34,6 +35,8 @@ export function UserLoginForm({ userInfo, onUserInfoChange, setCurrentStep }: Lo
       setIsLoading(false);
     }
   };
+
+
 
   return (
       <div className="bg-white p-6 w-full">
@@ -81,7 +84,9 @@ export function UserLoginForm({ userInfo, onUserInfoChange, setCurrentStep }: Lo
               </button>
             </div>
           </div>
-
+          <div className="flex justify-between">
+            <Link to="/forgot-password">Mot de passe oublié ?</Link>
+          </div>
           {/* Bouton de connexion */}
           <button
               disabled={isLoading}
