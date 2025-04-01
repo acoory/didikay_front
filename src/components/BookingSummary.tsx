@@ -1,8 +1,9 @@
-import React from "react";
+import React, {useEffect} from "react";
 import { Prestation, BookingSelection } from "../types/booking";
 import { Clock, Euro, User } from "lucide-react";
 import moment from "moment/min/moment-with-locales";
 import "moment/locale/fr";
+import configService from "../services/configService.ts";
 
 moment.locale("fr");
 
@@ -13,6 +14,17 @@ interface BookingSummaryProps {
 }
 
 export function BookingSummary({ services, selection, userInfo }: BookingSummaryProps) {
+  const [config, setConfig] = React.useState<any>(null);
+
+  useEffect(() => {
+    const getConfig = async () => {
+      const response = await configService.getConfig();
+      const data = response.data;
+      console.log(data);
+      setConfig(data);
+    };
+    getConfig();
+  }, []);
   const getSelectedServices = () => {
     if (!selection.prestationId) return [];
 
@@ -50,6 +62,16 @@ export function BookingSummary({ services, selection, userInfo }: BookingSummary
   const formatDate = (date: Date) => {
     return moment(date).format("dddd D MMMM");
   };
+
+  const calculatePriceWithMajoration = () => {
+    if (selection.slot?.isMajoration) {
+      const majorationAmount = (totalPrice * selection.slot.increaseRate) / 100;
+      return totalPrice + majorationAmount;
+    }
+    return totalPrice;
+  };
+
+  const priceWithMajoration = calculatePriceWithMajoration();
 
   console.log(selection.selectedDate);
 
@@ -94,18 +116,39 @@ export function BookingSummary({ services, selection, userInfo }: BookingSummary
                 <div className="flex items-center text-gray-600">
                   <Clock className="h-5 w-5 mr-2"/>
                   <span>
-            Durée totale: {hours}h{minutes.toFixed(0).padStart(2, "0")}{" "}
-          </span>
+                    Durée totale: {hours}h{minutes.toFixed(0).padStart(2, "0")}{" "}
+                  </span>
                 </div>
                 <div className="flex items-center text-gray-600">
                   <Euro className="h-5 w-5 mr-2"/>
                   <span>Total: {totalPrice.toFixed(2)}€</span>
                 </div>
+                {selection.slot?.isMajoration && (
+                  <div className="flex items-center text-orange-600">
+                    <Euro className="h-5 w-5 mr-2"/>
+                    <span>
+                      Majoration ({selection.slot.increaseRate}%): {(priceWithMajoration - totalPrice).toFixed(2)}€
+                    </span>
+                  </div>
+                )}
+                {selection.slot?.isMajoration && (
+                  <div className="flex items-center text-[#e86126] font-semibold">
+                    <Euro className="h-5 w-5 mr-2"/>
+                    <span>Total avec majoration: {priceWithMajoration.toFixed(2)}€</span>
+                  </div>
+                )}
               </div>
               <hr className="my-6 border-gray-200"/>
               <div className="flex items-center text-green-600 font-semibold ">
                 <Euro className="h-5 w-5 mr-2"/>
-                <span>Acompte à régler: {(totalPrice > 50 ? totalPrice * 0.4 : 10).toFixed(2)}€</span>
+                <span>
+  Acompte à régler :{" "}
+  {selection.slot?.isMajoration
+    ? (totalPrice > config.MIN_AMOUNT ? (totalPrice * config.PERCENTAGE * (1 + selection.slot.increaseRate / 100)).toFixed(2): (config.FIXED_FEE * (1 + selection.slot.increaseRate / 100)).toFixed(2))
+    : (totalPrice > config.MIN_AMOUNT ? totalPrice * config.PERCENTAGE : config.FIXED_FEE).toFixed(2)
+  }€
+</span>
+
               </div>
               <p className="text-sm text-gray-500">
                 Le reste sera à payer sur place en espèce le jour du rendez-vous merci de prévoir la somme exacte

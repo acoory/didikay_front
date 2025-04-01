@@ -38,7 +38,15 @@ export interface BookingSelection {
   subPrestationSelections: Record<number, number>; // subPrestationId -> serviceId
   selectedDate?: Date | null;
   selectedTime?: string | null;
-  slot?: any;
+  slot?: {
+    start: string;
+    start_unix: number;
+    end: string;
+    end_unix: number;
+    busy: boolean;
+    isMajoration: boolean;
+    increaseRate: number;
+  };
   devis?: any;
 }
 
@@ -51,6 +59,7 @@ export interface TimeSlot {
   end_unix: number;
   busy: boolean;
   vaccation: boolean;
+  isMajoration: boolean;
 }
 
 export interface ScheduleResponse {

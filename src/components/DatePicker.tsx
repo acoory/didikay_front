@@ -79,6 +79,7 @@ export function DatePicker({ selectedDate, selectedTime, onDateSelect, onTimeSel
     setError(null);
     try {
        await bookingService.getAvailableSlots(moment(date).valueOf(), totalDuration).then((res) => {
+         console.log("Available slots:", res.data.schedule);
         setTimeSlots(res.data.schedule);
       });
       setShowTimeSlots(true);
@@ -210,7 +211,7 @@ export function DatePicker({ selectedDate, selectedTime, onDateSelect, onTimeSel
 
               {!isLoading && !error && (
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    {timeSlots.map((slot) => (
+                    {timeSlots.map((slot:any) => (
                         <button
                             key={slot.start_unix}
                             onClick={() => !slot.busy && onTimeSelect(formatTime(slot.start), slot)}
@@ -230,6 +231,9 @@ export function DatePicker({ selectedDate, selectedTime, onDateSelect, onTimeSel
                           {!slot.vaccation && slot.busy && (
                               <span className="block text-xs text-gray-500">Indisponible</span>
                           )}
+                          {slot.isMajoration && !slot.busy && (
+                                <span className="block text-xs text-gray-500">Majoration</span>
+                            )}
                           {slot.vaccation && (
                               <span className="block text-xs text-gray-500">En congé</span>
                           )}
