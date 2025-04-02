@@ -231,8 +231,9 @@ export function ServiceSelection({ services, selection, onSelect, setDevis, devi
                         <div className="flex items-center space-x-2">
                           <span className="font-semibold text-gray-900">{service.name}</span>
                           <div className="flex items-center text-sm text-gray-500">
+                           {service.priceVariants.length > 0 ? "" : <>
                             <Clock className="h-4 w-4 mr-1" />
-                            {minutesToHours(service.duration_minutes)}
+                            {minutesToHours(service.duration_minutes)}</>}
                           </div>
                         </div>
                         <div className="flex items-center text-[#e86126] font-semibold">
