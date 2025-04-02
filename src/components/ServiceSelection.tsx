@@ -323,12 +323,15 @@ export function ServiceSelection({ services, selection, onSelect, setDevis, devi
                                 <div className="flex flex-col items-start">
                                   <span className="font-medium">{variant.name}</span>
                                   {variant.description && (
-                                    <span className="text-sm text-gray-500">{variant.description}</span>
+                                    <span className="text-sm text-gray-500 text-left">{variant.description}</span>
                                   )}
                                 </div>
-                                <div className="flex items-center space-x-3">
+                                <div className="flex flex-row md:flex-row items-center space-x-3">
+                                  <div className="flex flex-col md:flex-row items-center space-x-3">
+
                                   <span className="font-semibold">{variant.price}€</span>
-                                  <span className="text-sm text-gray-500">{variant.duration}min</span>
+                                  <span className="text-sm text-gray-500">{minutesToHours(variant.duration)}</span>
+                                  </div>
                                   <ChevronRight className="h-5 w-5" />
                                 </div>
                               </motion.button>
