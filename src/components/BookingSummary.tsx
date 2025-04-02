@@ -109,8 +109,8 @@ export function BookingSummary({ services, selection, userInfo, devis }: Booking
                       <div>
                         <div className="flex items-center space-x-2">
                         <span className="font-medium">{service.name}</span>
-                        {service?.priceVariants.find((variant: any) => variant?.price === service?.price)?.name &&(
-                        <span className="text-sm text-gray-500">({service?.priceVariants.find((variant: any) => variant?.price === service?.price)?.name})</span>
+                        {service?.priceVariants?.find((variant: any) => variant?.price === service?.price)?.name &&(
+                        <span className="text-sm text-gray-500">({service?.priceVariants?.find((variant: any) => variant?.price === service?.price)?.name})</span>
                         )}
                           </div>
                         {service.description && <p className="text-sm text-gray-500">{service.description}</p>}
