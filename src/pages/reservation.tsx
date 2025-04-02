@@ -55,10 +55,17 @@ function Reservation() {
   }, []);
 
   const canProceedToDate = () => {
-    if (!selection.prestationId) return false;
-    const selectedPrestation: any = services.find((s: any) => s.id === selection.prestationId);
-    if (!selectedPrestation) return false;
-    return selectedPrestation.subprestations.every((subPrestation: SubPrestation) => selection.subPrestationSelections[subPrestation.id]);
+    
+    if (Object.keys(selection.subPrestationSelections).length === 0) return false;
+
+
+    return true
+    // if (!selection.prestationId) return false;
+    // const selectedPrestation: any = services.find((s: any) => s.id === selection.prestationId);
+
+    // return selectedPrestation
+    // if (!selectedPrestation) return false;
+    // return selectedPrestation.subprestations.every((subPrestation: SubPrestation) => selection.subPrestationSelections[subPrestation.id]);
   };
 
   const canProceedToInfo = () => {
