@@ -308,7 +308,7 @@ export function ServiceSelection({ services, selection, onSelect, setDevis, devi
                             exit={{ opacity: 0, height: 0 }}
                             className="space-y-2"
                           >
-                            {service.priceVariants.map((variant) => (
+                            {service.priceVariants.sort((a:any, b:any) => parseFloat(a.price) - parseFloat(b.price)).map((variant:any) => (
                               <motion.button
                                 key={variant.id}
                                 whileHover={{ scale: 1.01 }}
