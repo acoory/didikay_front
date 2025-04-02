@@ -91,6 +91,8 @@ export function ServiceSelection({ services, selection, onSelect, setDevis, devi
     }
   };
 
+  
+
   const minutesToHours = (totalDuration: number) => {
     const duration = moment.duration(totalDuration, "minutes");
     const hours = Math.floor(duration.asHours());
@@ -176,6 +178,8 @@ export function ServiceSelection({ services, selection, onSelect, setDevis, devi
   const selectedPrestation = services.find((s) => s.id === selection.prestationId);
   if (!selectedPrestation) return null;
 
+  console.log(selectedPrestation);
+
   return (
     <motion.div 
       initial={{ opacity: 0 }}
@@ -202,7 +206,7 @@ export function ServiceSelection({ services, selection, onSelect, setDevis, devi
 
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
         <div className="p-6 space-y-8">
-          {selectedPrestation.subprestations.map((subPrestation, index) => (
+          {selectedPrestation.subprestations.sort((a:any,b:any) => a.order_index - b.order_index).map((subPrestation, index) => (
             <motion.div 
               key={subPrestation.id} 
               initial={{ opacity: 0, y: 20 }}
