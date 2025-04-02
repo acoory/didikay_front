@@ -185,12 +185,28 @@ function Reservation() {
                     <ServiceSelection services={services} selection={selection} onSelect={setSelection}
                                       setDevis={setDevis} devis={devis}/>
                     {canProceedToDate() && (
-                        <div className="mt-6">
+                        <div 
+                        style={{
+                          borderTop: "1px solid #10182740"
+                        }}
+                        className="mt-6  flex flex-row gap-2 w-full sticky bottom-[0px] bg-[#f9fafb] pb-[10px] pt-[10px]">
                           <button
                               onClick={handleNext}
                               className="w-full sm:w-auto px-6 py-3 bg-[#e86126] text-white font-medium rounded-lg hover:bg-[#ec7f2b] transition-colors"
                           >
                             Suivant →
+                          </button>
+                          <button
+                          onClick={() => {
+                            // move to down of the page
+                            window.scrollTo({
+                              top: document.body.scrollHeight,
+                              behavior: "smooth"
+                            });
+                          }}
+                           className="block md:hidden w-full sm:w-auto px-6 py-3 bg-[#e86126] text-white font-medium rounded-lg hover:bg-[#ec7f2b] transition-colors">
+                           
+                            <span>Voir le récapitulatif</span>
                           </button>
                         </div>
                     )}
@@ -215,12 +231,28 @@ function Reservation() {
                         daysOfWeek={daysOfWeek}
                     />
                     {selection.selectedDate && selection.selectedTime && (
-                        <div className="mt-6">
+                       <div 
+                       style={{
+                         borderTop: "1px solid #10182740"
+                       }}
+                       className="mt-6  flex flex-row gap-2 w-full sticky bottom-[0px] bg-[#f9fafb] pb-[10px] pt-[10px]">
                           <button
                               onClick={handleNext}
                               className="w-full sm:w-auto px-6 py-3 bg-[#e86126] text-white font-medium rounded-lg hover:bg-[#ec7f2b] transition-colors"
                           >
                             Suivant →
+                          </button>
+                          <button
+                          onClick={() => {
+                            // move to down of the page
+                            window.scrollTo({
+                              top: document.body.scrollHeight,
+                              behavior: "smooth"
+                            });
+                          }}
+                           className="block md:hidden w-full sm:w-auto px-6 py-3 bg-[#e86126] text-white font-medium rounded-lg hover:bg-[#ec7f2b] transition-colors">
+                           
+                            <span>Voir le récapitulatif</span>
                           </button>
                         </div>
                     )}

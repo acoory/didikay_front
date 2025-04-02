@@ -227,17 +227,11 @@ export function ServiceSelection({ services, selection, onSelect, setDevis, devi
                       whileHover={{ scale: 1.02 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                          <span className="font-semibold text-gray-900">{service.name}</span>
-                          <div className="flex items-center text-sm text-gray-500">
-                           {service.priceVariants.length > 0 ? "" : <>
-                            <Clock className="h-4 w-4 mr-1" />
-                            {minutesToHours(service.duration_minutes)}</>}
-                          </div>
-                        </div>
-                        <div className="flex items-center text-[#e86126] font-semibold">
-                          <Euro className="h-4 w-4 mr-1" />
+                      <div className="flex flex-col   justify-between">
+                        <div className="flex items-start mt-[10px] space-x-2">
+                          <span className="flex flex-col gap-1 font-semibold text-gray-900">{service.name}
+                          <div className="flex items-center text-[#e86126] font-semibold">
+                          {/* <Euro className="h-4 w-4 mr-1" /> */}
                           {service.priceVariants && service.priceVariants.length > 0 ? (
                             <>
                               <span className="text-sm mr-1">à partir de</span>
@@ -246,6 +240,29 @@ export function ServiceSelection({ services, selection, onSelect, setDevis, devi
                           ) : (
                             `${service.price}€`
                           )}
+                        </div>
+                          </span>
+                          <div
+                          style={{
+                            marginRight: "10px",
+                            marginTop: "3px"
+                          }}
+                           className="flex items-center text-sm text-gray-500">
+                           {service.priceVariants.length > 0 ? "" : <>
+                            <Clock className="h-4 w-4 mr-1" />
+                            {minutesToHours(service.duration_minutes)}</>}
+                          </div>
+                        </div>
+                        <div className="flex items-center text-[#e86126] font-semibold">
+                          {/* <Euro className="h-4 w-4 mr-1" /> */}
+                          {/* {service.priceVariants && service.priceVariants.length > 0 ? (
+                            <>
+                              <span className="text-sm mr-1">à partir de</span>
+                              {Math.min(...service.priceVariants.map(v => parseFloat(v.price)))}€
+                            </>
+                          ) : (
+                            `${service.price}€`
+                          )} */}
                         </div>
                       </div>
 
