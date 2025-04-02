@@ -86,7 +86,7 @@ export function BookingSummary({ services, selection, userInfo, devis }: Booking
   console.log(selection.selectedDate);
   console.log(devis);
   return (
-      <div className="bg-white rounded-lg shadow-md p-6">
+      <div className="bg-white rounded-lg shadow-md p-6 md:sticky md:top-[50px]">
         <h2 className="text-xl font-semibold mb-4">Récapitulatif de la réservation</h2>
         <div className="flex items-center space-x-2 mb-6">
           <div className="flex items-center space-x-2">

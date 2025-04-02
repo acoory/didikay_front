@@ -151,7 +151,7 @@ export function ServiceSelection({ services, selection, onSelect, setDevis, devi
         animate={{ opacity: 1, y: 0 }}
         className="grid grid-cols-1 md:grid-cols-2 gap-6"
       >
-        {services.map((prestation) => (
+        {services.map((prestation, index, prestationsArray) => (
           <motion.button
             key={prestation.id}
             onClick={() => {
@@ -160,7 +160,11 @@ export function ServiceSelection({ services, selection, onSelect, setDevis, devi
             }}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300"
+            className={`bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 ${
+              prestationsArray.length % 2 !== 0 && index === prestationsArray.length - 1
+                ? "md:col-span-2"
+                : ""
+            }`}
           >
             <div className="p-8 bg-gradient-to-r from-[#e86126] to-[#ec7f2b]">
               <h3 className="text-3xl font-bold text-white text-center">{prestation.name}</h3>
@@ -224,10 +228,14 @@ export function ServiceSelection({ services, selection, onSelect, setDevis, devi
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {subPrestation.services
                   .sort((a: any, b: any) => a?.price - b?.price)
-                  .map((service) => (
+                  .map((service, serviceIndex, servicesArray) => (
                     <motion.div 
                       key={service.id} 
-                      className="space-y-3 bg-gray-50 p-4 rounded-xl"
+                      className={`space-y-3 bg-gray-50 p-4 rounded-xl ${
+                        servicesArray.length % 2 !== 0 && serviceIndex === servicesArray.length - 1
+                          ? "sm:col-span-2"
+                          : ""
+                      }`}
                       whileHover={{ scale: 1.02 }}
                       transition={{ duration: 0.2 }}
                     >
