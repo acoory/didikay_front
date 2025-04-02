@@ -11,9 +11,10 @@ interface BookingSummaryProps {
   services: Prestation[];
   selection: BookingSelection;
   userInfo: any;
+  devis: any[];
 }
 
-export function BookingSummary({ services, selection, userInfo }: BookingSummaryProps) {
+export function BookingSummary({ services, selection, userInfo, devis }: BookingSummaryProps) {
   const [config, setConfig] = React.useState<any>(null);
 
   useEffect(() => {
@@ -43,7 +44,16 @@ export function BookingSummary({ services, selection, userInfo }: BookingSummary
       if (selectedServiceId) {
         const service = subPrestation.services.find((s) => s.id === selectedServiceId);
         if (service) {
-          selectedServices.push(service);
+          const devisService = devis.find((d: any) => d.subprestation_id === subPrestation.id);
+          if (devisService) {
+            selectedServices.push({
+              ...service,
+              price: devisService.price,
+              duration_minutes: devisService.duration_minutes || service.duration_minutes
+            });
+          } else {
+            selectedServices.push(service);
+          }
         }
       }
     });
@@ -59,7 +69,7 @@ export function BookingSummary({ services, selection, userInfo }: BookingSummary
   const hours = Math.floor(duration.asHours());
   const minutes = duration.minutes();
 
-  const formatDate = (date: Date) => {
+  const formatDate = (date: any) => {
     return moment(date).format("dddd D MMMM");
   };
 
@@ -74,7 +84,7 @@ export function BookingSummary({ services, selection, userInfo }: BookingSummary
   const priceWithMajoration = calculatePriceWithMajoration();
 
   console.log(selection.selectedDate);
-
+  console.log(devis);
   return (
       <div className="bg-white rounded-lg shadow-md p-6">
         <h2 className="text-xl font-semibold mb-4">Récapitulatif de la réservation</h2>
@@ -94,10 +104,15 @@ export function BookingSummary({ services, selection, userInfo }: BookingSummary
         {selectedServices.length > 0 ? (
             <>
               <div className="space-y-4 mb-6">
-                {selectedServices.map((service, index) => (
+                {selectedServices.map((service:any, index) => (
                     <div key={index} className="flex justify-between items-start py-2 border-b">
                       <div>
+                        <div className="flex items-center space-x-2">
                         <span className="font-medium">{service.name}</span>
+                        {service?.priceVariants.find((variant: any) => variant?.price === service?.price)?.name &&(
+                        <span className="text-sm text-gray-500">({service?.priceVariants.find((variant: any) => variant?.price === service?.price)?.name})</span>
+                        )}
+                          </div>
                         {service.description && <p className="text-sm text-gray-500">{service.description}</p>}
                       </div>
                       <span className="text-[#e86126] font-semibold">{service.price}€</span>

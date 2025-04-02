@@ -17,11 +17,11 @@ function Reservation() {
   // const [services, setServices] = useState([]);
   const [currentStep, setCurrentStep] = useState<BookingStep>("services");
   const [selection, setSelection] = useState<BookingSelection>({
-    prestationId: null,
+    prestationId: null as any,
     subPrestationSelections: {},
     selectedDate: null,
     selectedTime: null,
-    slot: null,
+    slot: null as any
   });
   const [accountType, setAccountType] = useState<"create" | "login">("create");
   const [devis, setDevis] = useState<any>([]);
@@ -70,7 +70,7 @@ function Reservation() {
   };
 
   const handleDateSelect = (date: Date) => {
-    setSelection((prev) => ({ ...prev, selectedDate: date }));
+    setSelection((prev) => ({ ...prev, selectedDate: date as any}));
   };
 
   const handleTimeSelect = (time: string, slot: any) => {
@@ -100,25 +100,59 @@ function Reservation() {
 
   const handleCreateAccount = async () => {
     try {
-      const res = await clientService.createAccount(userInfo);
-      if (res.status === 200) {
-        setCurrentStep("payment");
+      setLoading(true);
+      if (userInfo.firstname.trim() === "" || userInfo.lastname.trim() === "" || userInfo.email.trim() === "") {
+        setError("Veuillez remplir les champs obligatoires.");
+        setLoading(false);
+        return;
       }
+
+      await clientService.create(userInfo).then((res) => {
+        console.log("Account created:", res);
+      });
+
+      setError(null);
+      setIs_active_otp(true);
+      setLoading(false);
+      console.log("Account created:", userInfo);
     } catch (error) {
       console.error("Error creating account:", error);
+      setError("Un compte avec cet email existe déjà.");
+      setLoading(false);
     }
   };
 
-  const handleSubmitOTP = async () => {
+  const handleSubmitOtp = async () => {
     try {
-      const res = await clientService.verifyOTP(userInfo.email, otpCode);
-      if (res.status === 200) {
-        setCurrentStep("payment");
+      setLoading(true);
+      console.log("Submitting OTP code...");
+      if (otp_code.trim() === "") {
+        setError("Veuillez entrer le code reçu par email.");
+        setLoading(false);
+        return;
       }
+
+      const req = await clientService
+        .verifyOtp({
+          email: userInfo.email,
+          otp: otp_code,
+        })
+        .then((res) => {
+          console.log("OTP verified:", res);
+          // if (res.data.status === 200) {
+          setCurrentStep("payment");
+          setLoading(false);
+          // } else {
+          //   setError("Code OTP invalide.");
+          // }
+        });
     } catch (error) {
       console.error("Error submitting OTP:", error);
+      setError("Code invalide.");
+      setLoading(false);
     }
   };
+
 
   return (
       <div className="min-h-screen bg-gray-50">
@@ -165,7 +199,7 @@ function Reservation() {
                       </button>
                     </div>
                     <DatePicker
-                        selectedDate={selection.selectedDate as Date}
+                        selectedDate={selection.selectedDate as any}
                         selectedTime={selection.selectedTime as string}
                         onDateSelect={handleDateSelect}
                         onTimeSelect={handleTimeSelect as any}
@@ -267,7 +301,7 @@ function Reservation() {
                                   />
                                   <button
                                       disabled={loading}
-                                      onClick={handleSubmitOTP}
+                                      onClick={handleSubmitOtp}
                                       className="mt-4 bg-[#e86126] text-white px-4 py-2 rounded-md w-full font-semibold hover:bg-[#ec7f2b] transition"
                                   >
                                     {loading ? <div
@@ -305,7 +339,7 @@ function Reservation() {
 
 
             <div className="lg:col-span-1">
-              <BookingSummary services={services} selection={selection} userInfo={userInfo}/>
+              <BookingSummary services={services} selection={selection} userInfo={userInfo} devis={devis}/>
             </div>
           </div>
         </main>

@@ -1,3 +1,15 @@
+export interface PriceVariant {
+  id: number;
+  serviceId: number;
+  name: string;
+  description: string | null;
+  price: string;
+  duration: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Service {
   id: number;
   name: string;
@@ -5,6 +17,7 @@ export interface Service {
   price: string;
   duration_minutes: number;
   subprestation_id: number;
+  priceVariants: PriceVariant[];
 }
 
 export interface SubPrestation {
@@ -34,20 +47,11 @@ export interface UserInfo {
 }
 
 export interface BookingSelection {
-  prestationId: number | null;
-  subPrestationSelections: Record<number, number>; // subPrestationId -> serviceId
-  selectedDate?: Date | null;
-  selectedTime?: string | null;
-  slot?: {
-    start: string;
-    start_unix: number;
-    end: string;
-    end_unix: number;
-    busy: boolean;
-    isMajoration: boolean;
-    increaseRate: number;
-  };
-  devis?: any;
+  prestationId: number;
+  subPrestationSelections: Record<number, number>;
+  selectedDate: string | null;
+  selectedTime: string | null;
+  slot?: TimeSlot;
 }
 
 export type BookingStep = "services" | "date" | "info" | "payment";
@@ -60,6 +64,7 @@ export interface TimeSlot {
   busy: boolean;
   vaccation: boolean;
   isMajoration: boolean;
+  increaseRate: number;
 }
 
 export interface ScheduleResponse {

@@ -1,11 +1,16 @@
 import Api from "./api";
 
+type otpData = {
+  email: string;
+  otp: string;
+}
+
 export class ClientService extends Api {
   async create(data: any) {
     return this.instance.post(`/client/user/create`, data);
   }
 
-  async verifyOtp(data: any) {
+  async verifyOtp(data: otpData) {
     return this.instance.post(`/client/user/verify-otp`, data);
   }
 
