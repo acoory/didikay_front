@@ -42,3 +42,29 @@
     clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 0 100%, 0 0);
   }
 }
+
+@font-face {
+  font-family: 'TAN Moonlight';
+  src: url('./font/tan-moonlight/Moonlight.otf') format('opentype'),
+       url('./font/tan-moonlight/Moonlight.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.bw-background::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url('./images/3C0DED25-265D-44BD-9E9D-81C7F02E93F2.jpg');
+  background-size: cover;
+  background-position: center;
+  filter: grayscale(100%);
+  z-index: 0;
+  opacity: 1;
+}
+
+.bw-background > * {
+  position: relative;
+  z-index: 1;
+}
+

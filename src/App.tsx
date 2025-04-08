@@ -1,4 +1,5 @@
 import { Routes, Route } from "react-router";
+import { HelmetProvider } from 'react-helmet-async';
 
 import Home from "./pages/home";
 import Reservation from "./pages/reservation";
@@ -10,7 +11,7 @@ import ForgotPassword from "./pages/forgot-password";
 
 function App() {
   return (
-
+    <HelmetProvider>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/reservation" element={<Reservation />} />
@@ -20,6 +21,7 @@ function App() {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
       </Routes>
+    </HelmetProvider>
   );
 }
 

@@ -166,7 +166,7 @@ export function ServiceSelection({ services, selection, onSelect, setDevis, devi
                 : ""
             }`}
           >
-            <div className="p-8 bg-gradient-to-r from-[#e86126] to-[#ec7f2b]">
+            <div className="p-8 bg-gradient-to-r from-[#c6450c] to-[#ae5511]">
               <h3 className="text-3xl font-bold text-white text-center">{prestation.name}</h3>
             </div>
             <div className="p-6 flex items-center justify-between text-gray-600 bg-gray-50">

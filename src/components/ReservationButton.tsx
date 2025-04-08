@@ -24,9 +24,12 @@ export const ReservationButton: React.FC = () => {
         transition-all duration-1000 ease-out
         transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}
       `}
+            aria-label="Réserver un rendez-vous en ligne"
+            title="Réserver un rendez-vous chez KAYDIDI"
         >
             {/* Effet de brillance */}
-            <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out" />
+            <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out" 
+                 aria-hidden="true" />
 
             {/* Icône avec rotation */}
             <div className={`
@@ -34,7 +37,7 @@ export const ReservationButton: React.FC = () => {
         ${isVisible ? 'scale-100' : 'scale-0'}
         transition-transform duration-500 delay-300
       `}>
-                <Calendar className="w-5 h-5" />
+                <Calendar className="w-5 h-5" aria-hidden="true" />
             </div>
 
             {/* Texte */}
@@ -47,7 +50,8 @@ export const ReservationButton: React.FC = () => {
       </span>
 
             {/* Flèche animée */}
-            <span className="relative z-10 ml-1 transform transition-all duration-300 translate-x-2 opacity-0 group-hover:translate-x-0 group-hover:opacity-100">
+            <span className="relative z-10 ml-1 transform transition-all duration-300 translate-x-2 opacity-0 group-hover:translate-x-0 group-hover:opacity-100"
+                  aria-hidden="true">
         <svg
             className="w-5 h-5 animate-pulse"
             viewBox="0 0 24 24"

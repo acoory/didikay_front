@@ -6,10 +6,11 @@ import { ReservationButton } from "../components/ReservationButton.tsx";
 import { motion } from "framer-motion";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay, Parallax } from "swiper/modules";
+import { Helmet } from 'react-helmet-async';
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-
+import "../index.css";
 const images = [
   "/images/realisations/rea_1.webp",
   "/images/realisations/rea_2.webp",
@@ -43,6 +44,53 @@ function Home() {
   }, []);
   return (
       <div className="min-h-screen bg-white">
+        <Helmet>
+          <title>KAYDIDI - Salon de Coiffure à Marseille | Locks et Coiffures Afro</title>
+          <meta name="description" content="Spécialiste des locks, tresses, nattes et coiffures afro à Marseille. KAYDIDI vous propose des prestations de qualité pour sublimer vos cheveux. Réservez en ligne dès maintenant !" />
+          <meta name="keywords" content="salon coiffure, locks, tresses, nattes, coiffure afro, Marseille, 13002, KAYDIDI" />
+          <meta property="og:title" content="KAYDIDI - Salon de Coiffure à Marseille" />
+          <meta property="og:description" content="Spécialiste des locks, tresses, nattes et coiffures afro à Marseille. Réservez votre prestation en ligne." />
+          <meta property="og:type" content="website" />
+          <meta property="og:url" content="https://kaydidicoiffure.fr" />
+          <meta property="og:image" content="/images/logo.png" />
+          <link rel="canonical" href="https://kaydidicoiffure.fr" />
+          <meta name="robots" content="index, follow" />
+          <script type="application/ld+json">{`
+            {
+              "@context": "https://schema.org",
+              "@type": "HairSalon",
+              "name": "KAYDIDI",
+              "image": "/images/logo.png",
+              "url": "https://kaydidicoiffure.fr",
+              "telephone": "0769048760",
+              "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "Boulevard de Paris",
+                "addressLocality": "Marseille",
+                "postalCode": "13002",
+                "addressCountry": "FR"
+              },
+              "geo": {
+                "@type": "GeoCoordinates",
+                "latitude": 43.30496,
+                "longitude": 5.368023
+              },
+              "openingHoursSpecification": [
+                {
+                  "@type": "OpeningHoursSpecification",
+                  "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+                  "opens": "09:00",
+                  "closes": "19:00"
+                }
+              ],
+              "priceRange": "€€",
+              "sameAs": [
+                "https://www.instagram.com/kaydidi_locks/"
+              ],
+              "description": "Spécialiste des locks, tresses, nattes et coiffures afro à Marseille. KAYDIDI vous propose des prestations de qualité pour sublimer vos cheveux."
+            }
+          `}</script>
+        </Helmet>
         <Header/>
 
         {/* Hero Section */}
@@ -54,7 +102,7 @@ function Home() {
             className="relative h-[100vh] bg-cover bg-center"
             style={{
               backgroundImage:
-                  'url("https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80")',
+                  'url("./images/3C0DED25-265D-44BD-9E9D-81C7F02E93F2.jpg")',
             }}
         >
           <div className="absolute inset-0 bg-black bg-opacity-50"/>
@@ -64,6 +112,7 @@ function Home() {
                 animate={{opacity: 1, y: 0}}
                 transition={{delay: 0.3, duration: 0.8}}
                 className="text-5xl md:text-6xl font-bold mb-6 text-center"
+                style={{ fontFamily: 'TAN Moonlight' }}
             >
               KAYDIDI
             </motion.h1>
@@ -109,6 +158,7 @@ function Home() {
                 parallax={true}
                 onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
                 className="w-full h-[700px] rounded-lg"
+                aria-label="Galerie de réalisations"
             >
               {images.map((src, index) => (
                   <SwiperSlide key={index} className="relative flex justify-center rounded-lg">
@@ -125,8 +175,9 @@ function Home() {
                     >
                       <img
                           src={src}
-                          alt={`Slide ${index}`}
+                          alt={`Réalisation de coiffure ${index + 1} - KAYDIDI Salon`}
                           className="object-cover w-full h-full rounded-lg"
+                          loading={index <= 2 ? "eager" : "lazy"}
                       />
                     </div>
                   </SwiperSlide>
@@ -149,9 +200,9 @@ function Home() {
               <div className="max-w-3xl mx-auto text-center">
                 <h2 className="text-3xl font-bold mb-8">Notre Histoire</h2>
                 <p className="text-lg text-gray-600 leading-relaxed">
-                  Depuis 2010, notre salon s'engage à offrir des services de coiffure exceptionnels dans une ambiance
-                  chaleureuse et accueillante. Notre équipe de professionnels passionnés combine expertise technique et
-                  créativité pour révéler votre beauté naturelle.
+                Chez Kaydidi Coiffure, chaque coiffure commence par une vraie rencontre. Je te coiffe comme j’aimerais qu’on me coiffe : avec écoute, soin, et style. Diplômée et passionnée, j’accueille tous types de cheveux dans un salon privé où tu es au centre.
+Ici, pas de passage à la chaîne — juste toi, ton moment, ta coiffure. Bienvenue chez Kaididi.
+
                 </p>
               </div>
             </div>
@@ -180,7 +231,7 @@ function Home() {
                     <MapPin className="w-6 h-6 text-gray-600"/>
                     <div>
                       <h3 className="font-semibold">Adresse</h3>
-                      <p className="text-gray-600">49 boulevard de paris, 13002 Marseille</p>
+                      <p className="text-gray-600">boulevard de paris, 13002 Marseille</p>
                     </div>
                   </motion.div>
                   <motion.div
@@ -191,10 +242,10 @@ function Home() {
                       className="flex items-center gap-4"
                   >
                     <Phone className="w-6 h-6 text-gray-600"/>
-                    {/*<div>*/}
-                    {/*  <h3 className="font-semibold">Téléphone</h3>*/}
-                    {/*  <p className="text-gray-600"></p>*/}
-                    {/*</div>*/}
+                    <div>
+                     <h3 className="font-semibold">Téléphone</h3>
+                     <p className="text-gray-600">07 69 04 87 60</p>
+                    </div>
                   </motion.div>
                   <motion.div
                       initial={{opacity: 0, x: -50}}
@@ -204,10 +255,10 @@ function Home() {
                       className="flex items-center gap-4"
                   >
                     <Mail className="w-6 h-6 text-gray-600"/>
-                    {/*<div>*/}
-                    {/*  <h3 className="font-semibold">Email</h3>*/}
-                    {/*  <p className="text-gray-600">contact@salondecoiffure.fr</p>*/}
-                    {/*</div>*/}
+                    <div>
+                     <h3 className="font-semibold">Email</h3>
+                     <p className="text-gray-600">elodiieboyedon@gmail.com</p>
+                    </div>
                   </motion.div>
                 </div>
                 <motion.div
@@ -217,7 +268,17 @@ function Home() {
                     transition={{duration: 0.6}}
                     className="h-[300px] bg-gray-200 rounded-lg flex items-center justify-center text-gray-500"
                 >
-                  Carte Interactive
+           
+              <iframe
+  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2903.935424224028!2d5.368023!3d43.30496!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12c9c0b84552a4cb%3A0x25cc3db8b4e49df3!2sBoulevard%20de%20Paris%2C%2013002%20Marseille!5e0!3m2!1sfr!2sfr!4v1684936243851!5m2!1sfr!2sfr"
+  width="100%" 
+  height="100%" 
+  style={{border: 0}} 
+  allowFullScreen
+  loading="lazy"
+  referrerPolicy="no-referrer-when-downgrade"
+  ></iframe>
+
                 </motion.div>
               </div>
             </div>

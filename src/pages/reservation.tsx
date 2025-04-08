@@ -5,6 +5,7 @@ import { DatePicker } from "../components/DatePicker";
 import { Stepper } from "../components/Stepper";
 import { UserForm } from "../components/UserForm";
 import { PaymentStep } from "../components/PaymentStep";
+import { Helmet } from 'react-helmet-async';
 // import { services } from "./data/services";
 import { BookingSelection, BookingStep, SubPrestation, UserInfo } from "../types/booking";
 import { LogIn, Scissors, UserPlus } from "lucide-react";
@@ -163,11 +164,23 @@ function Reservation() {
 
   return (
       <div className="min-h-screen bg-gray-50">
+        <Helmet>
+          <title>Réservation en ligne | KAYDIDI Salon de Coiffure à Marseille</title>
+          <meta name="description" content="Réservez votre rendez-vous en ligne chez KAYDIDI - votre salon de coiffure spécialisé en locks et coiffures afro à Marseille. Choisissez vos services, date et heure en quelques clics." />
+          <meta name="keywords" content="réservation coiffure, rendez-vous locks, prise de rendez-vous coiffure afro, KAYDIDI, Marseille" />
+          <meta property="og:title" content="Réservation en ligne | KAYDIDI Salon de Coiffure" />
+          <meta property="og:description" content="Prenez rendez-vous facilement pour vos locks, tresses ou coiffure afro à Marseille. Réservation simple et rapide en ligne." />
+          <meta property="og:type" content="website" />
+          <meta property="og:url" content="https://kaydidicoiffure.fr/reservation" />
+          <meta property="og:image" content="/images/logo.png" />
+          <link rel="canonical" href="https://kaydidicoiffure.fr/reservation" />
+          <meta name="robots" content="index, follow" />
+        </Helmet>
         <header className="bg-white shadow-sm">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex items-center space-x-3">
               <Scissors className="h-8 w-8 text-[#e86126]"/>
-              <h1 className="text-2xl font-bold text-gray-900">✨ Salon de Coiffure</h1>
+              <h1 className="text-2xl font-bold text-gray-900">✨ Kaydidi Coiffure</h1>
             </div>
           </div>
         </header>
