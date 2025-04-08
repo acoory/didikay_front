@@ -201,7 +201,7 @@ function Home() {
                 <h2 className="text-3xl font-bold mb-8">Notre Histoire</h2>
                 <p className="text-lg text-gray-600 leading-relaxed">
                 Chez Kaydidi Coiffure, chaque coiffure commence par une vraie rencontre. Je te coiffe comme j’aimerais qu’on me coiffe : avec écoute, soin, et style. Diplômée et passionnée, j’accueille tous types de cheveux dans un salon privé où tu es au centre.
-Ici, pas de passage à la chaîne — juste toi, ton moment, ta coiffure. Bienvenue chez Kaididi.
+Ici, pas de passage à la chaîne — juste toi, ton moment, ta coiffure. Bienvenue chez Kaydidi.
 
                 </p>
               </div>
