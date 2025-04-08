@@ -232,7 +232,7 @@ export function DatePicker({ selectedDate, selectedTime, onDateSelect, onTimeSel
                                 <span className="block text-xs text-gray-500">Majoration</span>
                             )}
                           {slot.vaccation && (
-                              <span className="block text-xs text-gray-500">En congé</span>
+                              <span className="block text-xs text-gray-500">Indisponible</span>
                           )}
                         </button>
                     ))}
