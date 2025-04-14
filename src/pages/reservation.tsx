@@ -341,6 +341,9 @@ function Reservation() {
                                   <p className="text-sm text-gray-600 text-center mt-2">
                                     Un email vous a été envoyé pour valider votre compte. Veuillez entrer le code reçu
                                     par email.
+                                    <br />
+                                    <br />
+                                    Si vous n'avez pas reçu l'email, veuillez vérifier dans votre dossier spam.
                                   </p>
                                   {error && <div className="bg-red-50 text-red-600 p-4 rounded-lg mt-2">{error}</div>}
                                   <input
