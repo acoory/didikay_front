@@ -10,15 +10,23 @@ export function PaymentStep(props: any) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      // Assurer que le devis est au bon format avant l'envoi
+      const formattedDevis = devis.map((item: any) => ({
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        duration_minutes: item.duration_minutes,
+        servicePriceVariantId: item.servicePriceVariantId ?? null,
+        variantName: item.variantName || null
+      }));
+      
       const redirect = await stripeService.createPayment({
         formData: userInfo,
-        devis: devis,
+        devis: formattedDevis,
         booking: selection.slot,
       });
-      // window.open(redirect.data.url, "_blank");
+      
       window.location.href = redirect.data.url;
-
-
     } catch (error) {
       console.error("Error processing payment:", error);
     }

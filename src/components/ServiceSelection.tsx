@@ -14,6 +14,7 @@ interface ServiceSelectionProps {
 
 export function ServiceSelection({ services, selection, onSelect, setDevis, devis }: ServiceSelectionProps) {
   const [selectedVariants, setSelectedVariants] = useState<Record<number, number>>({});
+  const [expandedServices, setExpandedServices] = useState<Record<number, boolean>>({});
 
   const handlePrestationSelect = (prestationId: number) => {
     onSelect({
@@ -26,14 +27,65 @@ export function ServiceSelection({ services, selection, onSelect, setDevis, devi
   };
 
   const handleServiceSelect = (prestationId: number, subPrestationId: number, serviceId: number) => {
-    onSelect({
-      ...selection,
-      prestationId,
-      subPrestationSelections: {
-        ...selection.subPrestationSelections,
-        [subPrestationId]: serviceId,
-      },
-    });
+    const service = services.find((s) => s.id === prestationId)?.subprestations
+      .find(sub => sub.id === subPrestationId)
+      ?.services.find(s => s.id === serviceId);
+
+    if (!service) return;
+
+    // Si le service a des variantes de prix, afficher les options
+    if (service.priceVariants && service.priceVariants.length > 0) {
+      setExpandedServices(prev => ({
+        ...prev,
+        [serviceId]: !prev[serviceId]
+      }));
+      return;
+    }
+
+    const isCurrentlySelected = selection.subPrestationSelections[subPrestationId] === serviceId;
+
+    if (isCurrentlySelected) {
+      // Désélectionner le service
+      const newSubPrestationSelections = { ...selection.subPrestationSelections };
+      delete newSubPrestationSelections[subPrestationId];
+      
+      onSelect({
+        ...selection,
+        subPrestationSelections: newSubPrestationSelections
+      });
+      
+      setDevis((prevDevis: any) => 
+        prevDevis.filter((item: any) => item.id !== service.id)
+      );
+    } else {
+      // Sélectionner le service
+      onSelect({
+        ...selection,
+        prestationId,
+        subPrestationSelections: {
+          ...selection.subPrestationSelections,
+          [subPrestationId]: serviceId,
+        },
+      });
+      
+      // Sélectionner le service et réinitialiser les variantes
+      setSelectedVariants({});
+      setDevis((prevDevis: any) => {
+        if (prevDevis.some((item: any) => item.id === service.id)) {
+          return prevDevis.map((item: any) => 
+            item.id === service.id ? service : item
+          );
+        }
+        // Construire un nouveau service au format demandé
+        return [{
+          id: service.id,
+          name: service.name,
+          price: service.price,
+          duration_minutes: service.duration_minutes,
+          servicePriceVariantId: null
+        }];
+      });
+    }
   };
 
   const handlePriceVariantSelect = (prestationId: number, subPrestationId: number, serviceId: number, variant: PriceVariant) => {
@@ -59,7 +111,7 @@ export function ServiceSelection({ services, selection, onSelect, setDevis, devi
       });
 
       setDevis((prevDevis: any) => 
-        prevDevis.filter((item: any) => item.subprestation_id !== subPrestationId)
+        prevDevis.filter((item: any) => item.id !== serviceId)
       );
     } else {
       // Désélectionner toutes les autres variantes de la même catégorie
@@ -81,12 +133,14 @@ export function ServiceSelection({ services, selection, onSelect, setDevis, devi
         }
       });
 
-      // Mettre à jour le devis avec uniquement le nouveau service
+      // Mettre à jour le devis avec le nouveau format
       setDevis([{
-        ...selectedService,
+        id: serviceId,
+        name: selectedService.name,
         price: variant.price,
         duration_minutes: variant.duration,
-        subprestation_id: subPrestationId
+        servicePriceVariantId: variant.id,
+        variantName: variant.name
       }]);
     }
   };
@@ -304,15 +358,15 @@ export function ServiceSelection({ services, selection, onSelect, setDevis, devi
                                 });
                                 
                                 setDevis((prevDevis: any) => 
-                                  prevDevis.filter((item: any) => item.subprestation_id !== service.subprestation_id)
+                                  prevDevis.filter((item: any) => item.id !== service.id)
                                 );
                               } else {
                                 // Sélectionner le service et réinitialiser les variantes
                                 setSelectedVariants({});
                                 setDevis((prevDevis: any) => {
-                                  if (prevDevis.some((item: any) => item.subprestation_id === service.subprestation_id)) {
+                                  if (prevDevis.some((item: any) => item.id === service.id)) {
                                     return prevDevis.map((item: any) => 
-                                      item.subprestation_id === service.subprestation_id ? service : item
+                                      item.id === service.id ? service : item
                                     );
                                   }
                                   return [...prevDevis, service];

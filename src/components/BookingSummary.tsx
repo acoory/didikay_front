@@ -39,21 +39,23 @@ export function BookingSummary({ services, selection, userInfo, devis }: Booking
     const selectedPrestation = services.find((p) => p.id === selection.prestationId);
     if (!selectedPrestation) return [];
 
+    // Si nous avons des devis, utilisons-les directement car ils sont déjà formatés correctement
+    if (devis && devis.length > 0) {
+      return devis.map((service: any) => ({
+        name: service.name,
+        price: service.price,
+        duration_minutes: service.duration_minutes,
+        description: ""
+      }));
+    }
+
+    // Sinon, construisons les services à partir de la sélection (cas rare ou fallback)
     selectedPrestation.subprestations.forEach((subPrestation) => {
       const selectedServiceId = selection.subPrestationSelections[subPrestation.id];
       if (selectedServiceId) {
         const service = subPrestation.services.find((s) => s.id === selectedServiceId);
         if (service) {
-          const devisService = devis.find((d: any) => d.subprestation_id === subPrestation.id);
-          if (devisService) {
-            selectedServices.push({
-              ...service,
-              price: devisService.price,
-              duration_minutes: devisService.duration_minutes || service.duration_minutes
-            });
-          } else {
-            selectedServices.push(service);
-          }
+          selectedServices.push(service);
         }
       }
     });
@@ -104,20 +106,25 @@ export function BookingSummary({ services, selection, userInfo, devis }: Booking
         {selectedServices.length > 0 ? (
             <>
               <div className="space-y-4 mb-6">
-                {selectedServices.map((service:any, index) => (
+                {selectedServices.map((service:any, index) => {
+                  // Utiliser directement variantName s'il est disponible dans le devis
+                  const variantName = devis[index]?.variantName || "";
+                  
+                  return (
                     <div key={index} className="flex justify-between items-start py-2 border-b">
                       <div>
                         <div className="flex items-center space-x-2">
-                        <span className="font-medium">{service.name}</span>
-                        {service?.priceVariants?.find((variant: any) => variant?.price === service?.price)?.name &&(
-                        <span className="text-sm text-gray-500">({service?.priceVariants?.find((variant: any) => variant?.price === service?.price)?.name})</span>
-                        )}
-                          </div>
+                          <span className="font-medium">{service.name}</span>
+                          {variantName && (
+                            <span className="text-sm text-gray-500">({variantName})</span>
+                          )}
+                        </div>
                         {service.description && <p className="text-sm text-gray-500">{service.description}</p>}
                       </div>
                       <span className="text-[#e86126] font-semibold">{service.price}€</span>
                     </div>
-                ))}
+                  );
+                })}
               </div>
 
               {selection.selectedDate && selection.selectedTime && (
