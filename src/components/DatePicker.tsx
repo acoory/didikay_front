@@ -14,9 +14,10 @@ interface DatePickerProps {
   selection: any;
   services: any;
   daysOfWeek: any;
+  devis?: any[];
 }
 
-export function DatePicker({ selectedDate, selectedTime, onDateSelect, onTimeSelect, selection, services, daysOfWeek }: DatePickerProps) {
+export function DatePicker({ selectedDate, selectedTime, onDateSelect, onTimeSelect, selection, services, daysOfWeek, devis }: DatePickerProps) {
   const [currentMonth, setCurrentMonth] = useState(moment());
   const [showTimeSlots, setShowTimeSlots] = useState(false);
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
@@ -46,7 +47,17 @@ export function DatePicker({ selectedDate, selectedTime, onDateSelect, onTimeSel
   };
 
   const getSelectedServices = () => {
+    console.log("Selection in DatePicker:", selection);
+    console.log("Services in DatePicker:", services);
+    console.log("Devis in DatePicker:", devis);
+    
     if (!selection.prestationId) return [];
+
+    // Si nous avons un devis dans les props, on peut l'utiliser directement
+    if (devis && devis.length > 0) {
+      console.log("Using devis from props:", devis);
+      return devis;
+    }
 
     const selectedServices: Array<{
       name: string;
@@ -68,17 +79,25 @@ export function DatePicker({ selectedDate, selectedTime, onDateSelect, onTimeSel
       }
     });
 
+    console.log("Calculated selected services:", selectedServices);
     return selectedServices;
   };
 
   const selectedServices = getSelectedServices();
-  const totalDuration = selectedServices.reduce((sum, service) => sum + service.duration_minutes, 0);
+  const totalDuration = selectedServices.reduce((sum: number, service: any) => {
+    console.log(`Service: ${service.name}, Duration: ${service.duration_minutes} minutes`);
+    return sum + (service.duration_minutes || 0);
+  }, 0);
+
+  console.log(`Total duration calculated: ${totalDuration} minutes (${Math.floor(totalDuration/60)}h${totalDuration%60}min)`);
 
   const fetchTimeSlots = async (date: Date) => {
     setIsLoading(true);
     setError(null);
     try {
-       await bookingService.getAvailableSlots(moment(date).valueOf(), totalDuration).then((res) => {
+      console.log(`Sending booking request with duration: ${totalDuration} minutes`);
+      await bookingService.getAvailableSlots(moment(date).valueOf(), totalDuration).then((res) => {
+        console.log(`Received response from server: `, res.data);
         setTimeSlots(res.data.schedule);
       });
       setShowTimeSlots(true);

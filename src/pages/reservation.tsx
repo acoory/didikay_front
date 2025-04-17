@@ -56,17 +56,20 @@ function Reservation() {
   }, []);
 
   const canProceedToDate = () => {
-    
-    if (Object.keys(selection.subPrestationSelections).length === 0) return false;
+    // Vérifier si au moins un service est dans le récapitulatif
+    return devis.length > 0;
+  };
 
-
-    return true
-    // if (!selection.prestationId) return false;
-    // const selectedPrestation: any = services.find((s: any) => s.id === selection.prestationId);
-
-    // return selectedPrestation
-    // if (!selectedPrestation) return false;
-    // return selectedPrestation.subprestations.every((subPrestation: SubPrestation) => selection.subPrestationSelections[subPrestation.id]);
+  // Ajouter cette fonction pour être utilisée quand l'utilisateur change de prestation
+  const handleResetPrestation = () => {
+    setSelection({
+      prestationId: null as any,
+      subPrestationSelections: {},
+      selectedDate: null,
+      selectedTime: null,
+      slot: null as any
+    });
+    setDevis([]);
   };
 
   const canProceedToInfo = () => {
@@ -161,6 +164,40 @@ function Reservation() {
     }
   };
 
+  const handleRemoveService = (serviceId: number) => {
+    // Supprimer le service du devis
+    setDevis((prevDevis: any[]) => prevDevis.filter((item: any) => item.id !== serviceId));
+    
+    // Trouver la subPrestation correspondante au service et la supprimer de la sélection
+    let subPrestationToRemove: number | null = null;
+    
+    // Parcourir toutes les subPrestations pour trouver celle qui contient le service
+    services.forEach((prestation: any) => {
+      prestation.subprestations.forEach((subPrestation: any) => {
+        subPrestation.services.forEach((service: any) => {
+          if (service.id === serviceId) {
+            subPrestationToRemove = subPrestation.id;
+          }
+        });
+      });
+    });
+    
+    // Si on a trouvé la subPrestation, la supprimer de la sélection
+    if (subPrestationToRemove !== null) {
+      const newSubPrestationSelections = { ...selection.subPrestationSelections };
+      delete newSubPrestationSelections[subPrestationToRemove];
+      
+      setSelection((prev) => ({
+        ...prev,
+        subPrestationSelections: newSubPrestationSelections
+      }));
+    }
+  };
+
+  // Fonction pour revenir à l'étape de sélection des services
+  const handleBackToServices = () => {
+    setCurrentStep("services");
+  };
 
   return (
       <div className="min-h-screen bg-gray-50">
@@ -195,8 +232,14 @@ function Reservation() {
                     <h2 className="text-xl font-semibold mb-4">
                       {!selection.prestationId ? "✂️ Choisissez votre prestation" : "🎨 Sélectionnez vos services"}
                     </h2>
-                    <ServiceSelection services={services} selection={selection} onSelect={setSelection}
-                                      setDevis={setDevis} devis={devis}/>
+                    <ServiceSelection 
+                      services={services} 
+                      selection={selection} 
+                      onSelect={setSelection}
+                      setDevis={setDevis} 
+                      devis={devis}
+                      onResetPrestation={handleResetPrestation}
+                    />
                     {canProceedToDate() && (
                         <div 
                         style={{
@@ -242,6 +285,7 @@ function Reservation() {
                         selection={selection}
                         services={services}
                         daysOfWeek={daysOfWeek}
+                        devis={devis}
                     />
                     {selection.selectedDate && selection.selectedTime && (
                        <div 
@@ -394,7 +438,14 @@ function Reservation() {
 
 
             <div className="lg:col-span-1">
-              <BookingSummary services={services} selection={selection} userInfo={userInfo} devis={devis}/>
+              <BookingSummary 
+                services={services} 
+                selection={selection} 
+                userInfo={userInfo} 
+                devis={devis}
+                onRemoveService={currentStep === "services" ? handleRemoveService : undefined}
+                currentStep={currentStep}
+              />
             </div>
           </div>
         </main>

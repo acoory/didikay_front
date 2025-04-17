@@ -1,6 +1,6 @@
 import React, {useEffect} from "react";
-import { Prestation, BookingSelection } from "../types/booking";
-import { Clock, Euro, User } from "lucide-react";
+import { Prestation, BookingSelection, BookingStep } from "../types/booking";
+import { Clock, Euro, User, Trash2, ArrowLeft } from "lucide-react";
 import moment from "moment/min/moment-with-locales";
 import "moment/locale/fr";
 import configService from "../services/configService.ts";
@@ -12,9 +12,11 @@ interface BookingSummaryProps {
   selection: BookingSelection;
   userInfo: any;
   devis: any[];
+  onRemoveService?: (serviceId: number) => void;
+  currentStep?: BookingStep;
 }
 
-export function BookingSummary({ services, selection, userInfo, devis }: BookingSummaryProps) {
+export function BookingSummary({ services, selection, userInfo, devis, onRemoveService, currentStep }: BookingSummaryProps) {
   const [config, setConfig] = React.useState<any>(null);
 
   useEffect(() => {
@@ -109,10 +111,19 @@ export function BookingSummary({ services, selection, userInfo, devis }: Booking
                 {selectedServices.map((service:any, index) => {
                   // Utiliser directement variantName s'il est disponible dans le devis
                   const variantName = devis[index]?.variantName || "";
+                  // Récupérer le nom de la sous-prestation
+                  const subPrestationName = devis[index]?.subPrestationName || "";
                   
                   return (
                     <div key={index} className="flex justify-between items-start py-2 border-b">
                       <div>
+                        {subPrestationName && (
+                          <div className="mb-1">
+                            <span className="text-xs font-semibold text-gray-500 uppercase bg-gray-100 px-2 py-1 rounded">
+                              {subPrestationName}
+                            </span>
+                          </div>
+                        )}
                         <div className="flex items-center space-x-2">
                           <span className="font-medium">{service.name}</span>
                           {variantName && (
@@ -121,11 +132,28 @@ export function BookingSummary({ services, selection, userInfo, devis }: Booking
                         </div>
                         {service.description && <p className="text-sm text-gray-500">{service.description}</p>}
                       </div>
-                      <span className="text-[#e86126] font-semibold">{service.price}€</span>
+                      <div className="flex items-center space-x-2">
+                        <span className="text-[#e86126] font-semibold">{service.price}€</span>
+                        {onRemoveService && currentStep === "services" && (
+                          <button 
+                            onClick={() => onRemoveService(devis[index].id)}
+                            className="text-gray-400 hover:text-red-500 transition-colors p-1"
+                            title="Supprimer ce service"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        )}
+                      </div>
                     </div>
                   );
                 })}
               </div>
+
+              {currentStep !== "services" && selectedServices.length > 0 && (
+                <div className="mb-4 p-3 bg-blue-50 text-blue-700 rounded-lg text-sm">
+                  <p>Pour modifier vos services, veuillez revenir à l'étape "services".</p>
+                </div>
+              )}
 
               {selection.selectedDate && selection.selectedTime && (
                   <div className="mb-6 p-3 bg-[#fdeae1] rounded-lg">
