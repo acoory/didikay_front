@@ -133,7 +133,25 @@ export function DatePicker({ selectedDate, selectedTime, onDateSelect, onTimeSel
   };
 
   const handleNextMonth = () => {
-    setCurrentMonth(moment(currentMonth).add(1, "month"));
+    if (canShowNextMonth()) {
+      setCurrentMonth(moment(currentMonth).add(1, "month"));
+    }
+  };
+
+  const canShowNextMonth = () => {
+    const today = moment();
+    const currentMonthValue = currentMonth.month();
+    const todayMonthValue = today.month();
+    
+    if (currentMonthValue > todayMonthValue) {
+      return false;
+    }
+    
+    if (currentMonthValue === todayMonthValue && today.date() < 15) {
+      return false;
+    }
+    
+    return true;
   };
 
   return (
@@ -145,9 +163,15 @@ export function DatePicker({ selectedDate, selectedTime, onDateSelect, onTimeSel
                   <ChevronLeft className="w-5 h-5"/>
                 </button>
                 <h3 className="text-lg font-semibold capitalize">{formatMonth()}</h3>
-                <button onClick={handleNextMonth} className="p-2 hover:bg-gray-100 rounded-full">
-                  <ChevronRight className="w-5 h-5"/>
-                </button>
+                {canShowNextMonth() ? (
+                  <button onClick={handleNextMonth} className="p-2 hover:bg-gray-100 rounded-full">
+                    <ChevronRight className="w-5 h-5"/>
+                  </button>
+                ) : (
+                  <button disabled className="p-2 opacity-50 cursor-not-allowed">
+                    <ChevronRight className="w-5 h-5 text-gray-300"/>
+                  </button>
+                )}
               </div>
               <div className="grid grid-cols-7 gap-2 mb-2">
                 {["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"].map((day) => (
