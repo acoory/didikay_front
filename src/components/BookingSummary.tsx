@@ -23,7 +23,6 @@ export function BookingSummary({ services, selection, userInfo, devis, onRemoveS
     const getConfig = async () => {
       const response = await configService.getConfig();
       const data = response.data;
-      console.log(data);
       setConfig(data);
     };
     getConfig();
@@ -87,8 +86,6 @@ export function BookingSummary({ services, selection, userInfo, devis, onRemoveS
 
   const priceWithMajoration = calculatePriceWithMajoration();
 
-  console.log(selection.selectedDate);
-  console.log(devis);
   return (
       <div className="bg-white rounded-lg shadow-md p-6 md:sticky md:top-[50px]">
         <h2 className="text-xl font-semibold mb-4">Récapitulatif de la réservation</h2>

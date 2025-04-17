@@ -129,15 +129,10 @@ export function ServiceSelection({ services, selection, onSelect, setDevis, devi
       const newSelectedVariants = { ...selectedVariants };
       delete newSelectedVariants[serviceId];
       setSelectedVariants(newSelectedVariants);
-
-      console.log("Désélection d'une variante");
-      console.log("Sélection avant:", {...selection.subPrestationSelections});
       
       // Faire une copie sécurisée de la sélection actuelle
       const safeCopy = getSafeSelection(selection);
       delete safeCopy.subPrestationSelections[subPrestationId];
-      
-      console.log("Sélection après:", {...safeCopy.subPrestationSelections});
       
       // Mettre à jour la sélection
       onSelect(safeCopy);
@@ -172,10 +167,6 @@ export function ServiceSelection({ services, selection, onSelect, setDevis, devi
         subPrestationName: subPrestation.name
       };
 
-      console.log("Variant selected:", variant);
-      console.log("Duration from variant:", variant.duration);
-      console.log("New devis item:", newDevisItem);
-
       setDevis((prevDevis: any) => {
         // Si ce service existe déjà, le mettre à jour
         if (prevDevis.some((item: any) => item.id === serviceId)) {
@@ -185,11 +176,6 @@ export function ServiceSelection({ services, selection, onSelect, setDevis, devi
         }
         // Sinon l'ajouter aux services existants
         const updatedDevis = [...prevDevis, newDevisItem];
-        console.log("Updated devis:", updatedDevis);
-        
-        // Calculer la durée totale
-        const totalDuration = updatedDevis.reduce((sum, item) => sum + (item.duration_minutes || 0), 0);
-        console.log("Total duration after update:", totalDuration, "minutes");
         
         return updatedDevis;
       });
@@ -286,8 +272,6 @@ export function ServiceSelection({ services, selection, onSelect, setDevis, devi
 
   const selectedPrestation = services.find((s) => s.id === selection.prestationId);
   if (!selectedPrestation) return null;
-
-  console.log(selectedPrestation);
 
   return (
     <motion.div 
@@ -450,10 +434,6 @@ export function ServiceSelection({ services, selection, onSelect, setDevis, devi
                                           subPrestationName: subPrestation.name
                                         };
                                         
-                                        console.log("Standard service selected:", service);
-                                        console.log("Service duration:", service.duration_minutes);
-                                        console.log("New devis item for standard service:", newDevisItem);
-                                        
                                         // Utiliser la fonction utilitaire pour créer une copie sécurisée
                                         const safeCopy = getSafeSelection(selection);
                                         safeCopy.prestationId = selectedPrestation.id;
@@ -470,9 +450,6 @@ export function ServiceSelection({ services, selection, onSelect, setDevis, devi
                                           }
                                           
                                           const updatedDevis = [...prevDevis, newDevisItem];
-                                          // Calculer la durée totale
-                                          const totalDuration = updatedDevis.reduce((sum, item) => sum + (item.duration_minutes || 0), 0);
-                                          console.log("Total duration after standard service added:", totalDuration, "minutes");
                                           
                                           return updatedDevis;
                                         });
