@@ -92,7 +92,6 @@ function Home() {
           `}</script>
         </Helmet>
         <Header/>
-
         {/* Hero Section */}
         <motion.div
             id={"salon"}
