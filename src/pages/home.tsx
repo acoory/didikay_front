@@ -52,7 +52,7 @@ function Home() {
           <meta property="og:description" content="Spécialiste des locks, tresses, nattes et coiffures afro à Marseille. Réservez votre prestation en ligne." />
           <meta property="og:type" content="website" />
           <meta property="og:url" content="https://kaydidicoiffure.fr" />
-          <meta property="og:image" content="/images/logo.png" />
+          <meta property="og:image" content="https://kaydidicoiffure.fr/images/logo.png" />
           <link rel="canonical" href="https://kaydidicoiffure.fr" />
           <meta name="robots" content="index, follow" />
           <script type="application/ld+json">{`
@@ -60,9 +60,9 @@ function Home() {
               "@context": "https://schema.org",
               "@type": "HairSalon",
               "name": "KAYDIDI",
-              "image": "/images/logo.png",
+              "image": "https://kaydidicoiffure.fr/images/logo.png",
               "url": "https://kaydidicoiffure.fr",
-              "telephone": "0769048760",
+              "telephone": "+33769048760",
               "address": {
                 "@type": "PostalAddress",
                 "streetAddress": "Boulevard de Paris",
@@ -85,7 +85,7 @@ function Home() {
               ],
               "priceRange": "€€",
               "sameAs": [
-                "https://www.instagram.com/kaydidi_locks/"
+                "https://www.instagram.com/_kaydidi_/"
               ],
               "description": "Spécialiste des locks, tresses, nattes et coiffures afro à Marseille. KAYDIDI vous propose des prestations de qualité pour sublimer vos cheveux."
             }
