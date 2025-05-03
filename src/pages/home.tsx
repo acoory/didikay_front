@@ -55,6 +55,7 @@ function Home() {
           <meta property="og:image" content="https://kaydidicoiffure.fr/images/logo.png" />
           <link rel="canonical" href="https://kaydidicoiffure.fr" />
           <meta name="robots" content="index, follow" />
+          <link rel="icon" href="https://kaydidicoiffure.fr/images/favicon.ico" type="image/x-icon" />
           <script type="application/ld+json">{`
             {
               "@context": "https://schema.org",
