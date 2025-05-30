@@ -23,9 +23,13 @@ export function UserLoginForm({ userInfo, onUserInfoChange, setCurrentStep }: Lo
     try {
       setIsLoading(true);
       await clientService.login(userLogin).then((response) => {
-        console.log(response);
+        // console.log(response.data.user);
         onUserInfoChange(response.data.user);
-        setCurrentStep("payment");
+        if(response.data.user.is_verified) {
+          setCurrentStep("payment");
+        } else {
+          setCurrentStep("otp");
+        }
       });
       setIsLoading(false);
     } catch (error: any) {

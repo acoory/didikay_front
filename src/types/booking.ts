@@ -54,7 +54,7 @@ export interface BookingSelection {
   slot?: TimeSlot;
 }
 
-export type BookingStep = "services" | "date" | "info" | "payment";
+export type BookingStep = "services" | "date" | "info" | "payment" | "otp";
 
 export interface TimeSlot {
   start: string;

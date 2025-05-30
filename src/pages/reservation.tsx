@@ -422,6 +422,38 @@ function Reservation() {
                     </div>
                   </>
               )}
+
+              {currentStep === "otp" && (
+                  <div className="flex flex-col items-center">
+                  <h2 className="text-lg font-semibold text-gray-800 text-center">Vérification de votre
+                    compte</h2>
+                  <p className="text-sm text-gray-600 text-center mt-2">
+                    Un email vous a été envoyé pour valider votre compte. Veuillez entrer le code reçu
+                    par email.
+                    <br />
+                    <br />
+                    Si vous n'avez pas reçu l'email, veuillez vérifier dans votre dossier spam.
+                  </p>
+                  {error && <div className="bg-red-50 text-red-600 p-4 rounded-lg mt-2">{error}</div>}
+                  <input
+                      type="text"
+                      value={otp_code}
+                      onChange={(e) => setOtp_code(e.target.value)}
+                      className="mt-4 px-4 py-2 border rounded-md w-full text-center text-lg tracking-widest focus:border-[#e86126] focus:ring-[#ec7f2b]"
+                      placeholder="123456"
+                      maxLength={6}
+                  />
+                  <button
+                      disabled={loading}
+                      onClick={handleSubmitOtp}
+                      className="mt-4 bg-[#e86126] text-white px-4 py-2 rounded-md w-full font-semibold hover:bg-[#ec7f2b] transition"
+                  >
+                    {loading ? <div
+                        className="animate-spin ml-2 h-5 w-5 border-t-2 border-b-2 border-white rounded-full"></div> : "Valider le code"}
+                  </button>
+                </div>
+              )}
+
               {currentStep === "payment" && (
                   <>
                     <div className="flex items-center justify-between mb-4">
