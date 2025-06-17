@@ -76,7 +76,7 @@ export const Header: React.FC = () => {
                 {/* Réseaux sociaux et Menu Mobile */}
                 <div className="flex items-center gap-4">
                     <div className="hidden md:block w-[200px] flex justify-end">
-                        <InstagramCounter scrolled={scrolled} followers={348}/>
+                        <InstagramCounter scrolled={scrolled} followers={790}/>
                     </div>
 
                     {/* Bouton Menu Mobile */}
