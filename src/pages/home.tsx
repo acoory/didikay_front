@@ -269,8 +269,7 @@ Ici, pas de passage à la chaîne — juste toi, ton moment, ta coiffure. Bienve
                     className="h-[300px] bg-gray-200 rounded-lg flex items-center justify-center text-gray-500"
                 >
            
-           <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d5806.628819435756!2d5.368708776616624!3d43.307677274709164!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12c9c0ed1b7a1abb%3A0xe78e008dc7efdfe4!2s49%20Bd%20de%20Paris%2C%2013002%20Marseille!5e0!3m2!1sfr!2sfr!4v1750167182340!5m2!1sfr!2sfr" width="600" height="450" style={{border:0}} allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
-
+           <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d5806.628819435756!2d5.368708776616624!3d43.307677274709164!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12c9c0ed1b7a1abb%3A0xe78e008dc7efdfe4!2s49%20Bd%20de%20Paris%2C%2013002%20Marseille!5e0!3m2!1sfr!2sfr!4v1750167182340!5m2!1sfr!2sfr" width="400" height="300" style={{border:0}} allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
                 </motion.div>
               </div>
             </div>
