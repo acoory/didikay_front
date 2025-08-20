@@ -5,6 +5,7 @@ import { DatePicker } from "../components/DatePicker";
 import { Stepper } from "../components/Stepper";
 import { UserForm } from "../components/UserForm";
 import { PaymentStep } from "../components/PaymentStep";
+import { LocalSeoFooter } from "../components/LocalSeoFooter";
 import { Helmet } from 'react-helmet-async';
 // import { services } from "./data/services";
 import { BookingSelection, BookingStep, SubPrestation, UserInfo } from "../types/booking";
@@ -481,6 +482,8 @@ function Reservation() {
             </div>
           </div>
         </main>
+        
+        <LocalSeoFooter />
       </div>
 
   );

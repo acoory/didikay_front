@@ -16,5 +16,16 @@ export default defineConfig({
     strictPort: true,
     host: true,
     origin: "http://0.0.0.0:8080",
+    // historyApiFallback: true,
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          router: ['react-router']
+        }
+      }
+    }
+  }
 });

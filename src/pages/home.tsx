@@ -3,6 +3,7 @@ import { MapPin, Phone, Mail, Instagram, Facebook } from "lucide-react";
 // import ImageCarousel from "../components/ImageCarousel";
 import { Header } from "../components/Header.tsx";
 import { ReservationButton } from "../components/ReservationButton.tsx";
+import { LocalSeoFooter } from "../components/LocalSeoFooter.tsx";
 import { motion } from "framer-motion";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay, Parallax } from "swiper/modules";
@@ -274,6 +275,8 @@ Ici, pas de passage à la chaîne — juste toi, ton moment, ta coiffure. Bienve
               </div>
             </div>
           </motion.section>
+
+          <LocalSeoFooter />
       </div>
 );
 }
