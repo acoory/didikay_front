@@ -15,7 +15,13 @@ const cities = [
   { name: "Cassis", slug: "cassis" },
   { name: "La Ciotat", slug: "la-ciotat" },
   { name: "Gardanne", slug: "gardanne" },
-  { name: "Martigues", slug: "martigues" }
+  { name: "Martigues", slug: "martigues" },
+  { name: "Salon-de-Provence", slug: "salon-de-provence" },
+  { name: "Fuveau", slug: "fuveau" },
+  { name: "Marignane", slug: "marignane" },
+  { name: "Berre-l'Étang", slug: "berre-l-etang" },
+  { name: "Istres", slug: "istres" },
+  { name: "Rognac", slug: "rognac" }
 ];
 
 // Services complets (synchronisés avec localSeoData.ts - 28 services)
