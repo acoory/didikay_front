@@ -80,25 +80,25 @@ function generateSitemapXml() {
   });
 
   // Pages par ville
-  cities.forEach(city => {
-    // Page coiffeur-ville (ancienne structure)
-    sitemap += `
-  <url>
-    <loc>${baseUrl}/coiffeur-${city.slug}</loc>
-    <lastmod>${currentDate}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>`;
+  // cities.forEach(city => {
+  //   // Page coiffeur-ville (ancienne structure)
+  //   sitemap += `
+  // <url>
+  //   <loc>${baseUrl}/coiffeur-${city.slug}</loc>
+  //   <lastmod>${currentDate}</lastmod>
+  //   <changefreq>weekly</changefreq>
+  //   <priority>0.8</priority>
+  // </url>`;
     
-    // Page ville (nouvelle structure simplifiée)
-    sitemap += `
-  <url>
-    <loc>${baseUrl}/${city.slug}</loc>
-    <lastmod>${currentDate}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>`;
-  });
+  //   // Page ville (nouvelle structure simplifiée)
+  //   sitemap += `
+  // <url>
+  //   <loc>${baseUrl}/${city.slug}</loc>
+  //   <lastmod>${currentDate}</lastmod>
+  //   <changefreq>weekly</changefreq>
+  //   <priority>0.8</priority>
+  // </url>`;
+  // });
 
   // Pages service-ville (nouvelle structure /ville/service)
   cities.forEach(city => {
