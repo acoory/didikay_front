@@ -20,7 +20,7 @@ jobs:
       - name: Deploy on server
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
-            cd /home/ubuntu/daylii &&
+            cd /var/www/didikay_front &&
             git pull origin main &&
             sudo docker compose up -d --build
           "
