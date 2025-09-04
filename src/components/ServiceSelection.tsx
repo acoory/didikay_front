@@ -308,7 +308,7 @@ export function ServiceSelection({ services, selection, onSelect, setDevis, devi
               className="border rounded-xl overflow-hidden"
             >
               <div 
-                className="flex items-center justify-between p-4 bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors"
+                className="flex flex-col md:flex-row md:items-center justify-between p-4 bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors"
                 onClick={() => setExpandedSubPrestation(expandedSubPrestation === subPrestation.id ? null : subPrestation.id)}
               >
                 <div className="flex items-center space-x-4">
@@ -319,16 +319,16 @@ export function ServiceSelection({ services, selection, onSelect, setDevis, devi
                     </span>
                   )}
                 </div>
-                <div className="flex items-center space-x-3">
-                  <span className="text-sm text-gray-500">
+                <div className="flex items-center md:space-x-3">
+                  <span className="hidden md:block text-sm text-gray-500">
                     {subPrestation.services.length} services disponibles
                   </span>
                   <motion.div
                     animate={{ rotate: expandedSubPrestation === subPrestation.id ? 180 : 0 }}
                     transition={{ duration: 0.3 }}
-                    className="bg-[#ec7f2b26] rounded-full p-1"
+                    className="bg-[#ec7f2b26] rounded-full p-1 mr-2 md:mr-0"
                   >
-                    <ChevronDown className={`h-5 w-5 ${expandedSubPrestation === subPrestation.id ? "text-[#e86126]" : "text-gray-500"}`} />
+                    <ChevronDown className={`md:h-5 md:w-5 h-4 w-4 ${expandedSubPrestation === subPrestation.id ? "text-[#e86126]" : "text-gray-500"}`} />
                   </motion.div>
                   <span className="text-sm font-medium text-[#e86126]">
                     {expandedSubPrestation === subPrestation.id ? "Masquer" : "Afficher les services"}

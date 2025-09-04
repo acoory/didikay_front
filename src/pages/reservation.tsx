@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ServiceSelection } from "../components/ServiceSelection";
 import { BookingSummary } from "../components/BookingSummary";
 import { DatePicker } from "../components/DatePicker";
@@ -40,6 +40,7 @@ function Reservation() {
   const [is_active_otp, setIs_active_otp] = useState<boolean>(false);
   const [otp_code, setOtp_code] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
+  const SummaryRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -257,7 +258,7 @@ function Reservation() {
                           onClick={() => {
                             // move to down of the page
                             window.scrollTo({
-                              top: document.body.scrollHeight,
+                              top: SummaryRef?.current?.offsetTop ? SummaryRef?.current?.offsetTop : 0,
                               behavior: "smooth"
                             });
                           }}
@@ -304,7 +305,7 @@ function Reservation() {
                           onClick={() => {
                             // move to down of the page
                             window.scrollTo({
-                              top: document.body.scrollHeight,
+                              top: SummaryRef?.current?.offsetTop ? SummaryRef?.current?.offsetTop - 100 : 0,
                               behavior: "smooth"
                             });
                           }}
@@ -470,7 +471,7 @@ function Reservation() {
             </div>
 
 
-            <div className="lg:col-span-1">
+            <div className="lg:col-span-1" ref={SummaryRef}>
               <BookingSummary 
                 services={services} 
                 selection={selection} 
