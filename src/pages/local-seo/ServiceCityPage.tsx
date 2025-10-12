@@ -22,17 +22,43 @@ export default function ServiceCityPage() {
       try {
         const response = await prestationService.getPrestations();
         // Extraire toutes les sous-prestations de toutes les prestations
+        console.log(response.data);
+
         const allSubPrestations: any[] = [];
         response.data.prestation.forEach((prestation: any) => {
           if (prestation.subprestations) {
             prestation.subprestations.forEach((subPrestation: any) => {
+              // Extraire tous les services de cette sous-prestation
+              const services =
+                subPrestation.services?.map((srv: any) => {
+                  // Vérifier si le service a des variantes de prix
+                  const priceVariants = srv.priceVariants || [];
+                  let minPrice = srv.price || "0.00";
+                  let hasVariants = false;
+
+                  if (priceVariants.length > 0) {
+                    // Calculer le prix minimum parmi les variantes
+                    const prices = priceVariants.map((variant: any) => parseFloat(variant.price || "0"));
+                    minPrice = Math.min(...prices).toString();
+                    hasVariants = true;
+                  }
+
+                  return {
+                    id: srv.id,
+                    name: srv.name,
+                    description: srv.description || "",
+                    price: minPrice,
+                    hasVariants: hasVariants,
+                    duration: srv.duration_minutes || 0,
+                  };
+                }) || [];
+
               allSubPrestations.push({
                 id: subPrestation.id,
                 name: subPrestation.name,
                 slug: subPrestation.name.toLowerCase().replace(/[\s/]+/g, "-"),
                 description: subPrestation.description || "",
-                price: subPrestation.price || "0.00",
-                duration: subPrestation.duration || 0,
+                services: services, // Tous les services avec leurs prix
                 category: prestation.name.toLowerCase(),
               });
             });
@@ -89,8 +115,7 @@ export default function ServiceCityPage() {
       cityDistance={cityData.distance}
       cityDescription={cityData.description}
       serviceDescription={serviceData.description}
-      price={serviceData.price}
-      duration={serviceData.duration}
+      services={serviceData.services}
       category={serviceData.category}
     />
   );

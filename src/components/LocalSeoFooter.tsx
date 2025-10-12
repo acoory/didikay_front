@@ -22,13 +22,36 @@ export const LocalSeoFooter: React.FC<LocalSeoFooterProps> = ({ currentCity, cur
         response.data.prestation.forEach((prestation: any) => {
           if (prestation.subprestations) {
             prestation.subprestations.forEach((subPrestation: any) => {
+              // Extraire tous les services de cette sous-prestation
+              const services = subPrestation.services?.map((srv: any) => {
+                // Vérifier si le service a des variantes de prix
+                const priceVariants = srv.price_variants || [];
+                let minPrice = srv.price || "0.00";
+                let hasVariants = false;
+
+                if (priceVariants.length > 0) {
+                  // Calculer le prix minimum parmi les variantes
+                  const prices = priceVariants.map((variant: any) => parseFloat(variant.price || "0"));
+                  minPrice = Math.min(...prices).toString();
+                  hasVariants = true;
+                }
+
+                return {
+                  id: srv.id,
+                  name: srv.name,
+                  description: srv.description || "",
+                  price: minPrice,
+                  hasVariants: hasVariants,
+                  duration: srv.duration_minutes || 0,
+                };
+              }) || [];
+
               allSubPrestations.push({
                 id: subPrestation.id,
                 name: subPrestation.name,
-                slug: subPrestation.name.toLowerCase().replace(/\s+/g, "-"),
+                slug: subPrestation.name.toLowerCase().replace(/[\s/]+/g, "-"),
                 description: subPrestation.description || "",
-                price: subPrestation.price || "0.00",
-                duration: subPrestation.duration || 0,
+                services: services,
                 category: prestation.name.toLowerCase(),
               });
             });
