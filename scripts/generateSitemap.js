@@ -1,8 +1,12 @@
 /**
  * Script de génération du sitemap XML pour les pages SEO locales
+ * Utilise l'API pour récupérer les prestations dynamiquement
  */
 
-const fs = require('fs');
+import fs from "fs";
+import axios from "axios";
+
+// Charger les variables d'environnement
 
 // Données des villes (synchronisées avec localSeoData.ts)
 const cities = [
@@ -15,55 +19,59 @@ const cities = [
   { name: "Cassis", slug: "cassis" },
   { name: "La Ciotat", slug: "la-ciotat" },
   { name: "Gardanne", slug: "gardanne" },
-  { name: "Martigues", slug: "martigues" }
+  { name: "Martigues", slug: "martigues" },
+  { name: "Salon-de-Provence", slug: "salon-de-provence" },
+  { name: "Fuveau", slug: "fuveau" },
+  { name: "Marignane", slug: "marignane" },
+  { name: "Berre-l'Étang", slug: "berre-l-etang" },
+  { name: "Istres", slug: "istres" },
+  { name: "Rognac", slug: "rognac" },
 ];
 
-// Services complets (synchronisés avec localSeoData.ts - 28 services)
-const mainServices = [
-  { name: "Twist", slug: "twist" },
-  { name: "Vanille", slug: "vanille" },
-  { name: "Braids", slug: "braids" },
-  { name: "Micro Locks", slug: "micro-locks" },
-  { name: "Knotless Braids", slug: "knotless-braids" },
-  { name: "Passion Twist", slug: "passion-twist" },
-  { name: "Faux Locks", slug: "faux-locks" },
-  { name: "Coupe", slug: "coupe" },
-  { name: "Coupe Enfant", slug: "coupe-enfant" },
-  { name: "Reprise Racines", slug: "reprise-racines" },
-  { name: "Défrisage", slug: "defrisage" },
-  { name: "Lissage Brésilien", slug: "lissage-bresilien" },
-  { name: "Coiffure Cheveux Crépus", slug: "coiffure-cheveux-crepus" },
-  { name: "Coiffure Cheveux Bouclés", slug: "coiffure-cheveux-boucles" },
-  { name: "Coiffure Cheveux Lisses", slug: "coiffure-cheveux-lisses" },
-  { name: "Salon Cheveux Afro", slug: "salon-cheveux-afro" },
-  { name: "Box Braids", slug: "box-braids" },
-  { name: "Cornrows", slug: "cornrows" },
-  { name: "Tissage", slug: "tissage" },
-  { name: "Perruque", slug: "perruque" },
-  { name: "Soin Cheveux Crépus", slug: "soin-cheveux-crepus" },
-  { name: "Soin Cheveux Bouclés", slug: "soin-cheveux-boucles" },
-  { name: "Coiffeur Afro", slug: "coiffeur-afro" },
-  { name: "Tresses Africaines", slug: "tresses-africaines" },
-  { name: "Locks Naturelles", slug: "locks-naturelles" },
-  { name: "Cheveux Métissés", slug: "cheveux-metisses" },
-  { name: "Entretien Locks", slug: "entretien-locks" },
-  { name: "Coiffure Protectrice", slug: "coiffure-protectrice" }
-];
+async function fetchPrestationsFromAPI() {
+  try {
+    // Utiliser l'URL de l'API depuis les variables d'environnement
+    const API_URL = process.env.VITE_API_URL_PROD || "https://api.kaydidicoiffure.fr/api";
+    const response = await axios.get(`${API_URL}/client/prestation`);
 
-function generateSitemapXml() {
-  const baseUrl = 'https://kaydidicoiffure.fr'; // À modifier selon votre domaine
-  const currentDate = new Date().toISOString().split('T')[0];
-  
+    const allSubPrestations = [];
+
+    response.data.prestation.forEach((prestation) => {
+      if (prestation.subprestations) {
+        prestation.subprestations.forEach((subPrestation) => {
+          allSubPrestations.push({
+            slug: subPrestation.name.toLowerCase().replace(/[\s/]+/g, "-"),
+            name: subPrestation.name,
+          });
+        });
+      }
+    });
+
+    return allSubPrestations;
+  } catch (error) {
+    console.error("❌ Erreur lors de la récupération des prestations:", error.message);
+    console.log("⚠️  Utilisation des données de secours...");
+    return [];
+  }
+}
+
+async function generateSitemapXml() {
+  const baseUrl = "https://kaydidicoiffure.fr"; // À modifier selon votre domaine
+  const currentDate = new Date().toISOString().split("T")[0];
+
+  // Récupérer les prestations depuis l'API
+  const prestations = await fetchPrestationsFromAPI();
+
   let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`;
 
   // Pages principales
   const mainPages = [
-    { url: baseUrl, priority: '1.0' },
-    { url: `${baseUrl}/reservation`, priority: '0.9' }
+    { url: baseUrl, priority: "1.0" },
+    { url: `${baseUrl}/reservation`, priority: "0.9" },
   ];
 
-  mainPages.forEach(page => {
+  mainPages.forEach((page) => {
     sitemap += `
   <url>
     <loc>${page.url}</loc>
@@ -74,25 +82,25 @@ function generateSitemapXml() {
   });
 
   // Pages par ville
-  cities.forEach(city => {
+  cities.forEach((city) => {
     sitemap += `
   <url>
-    <loc>${baseUrl}/coiffeur-${city.slug}</loc>
-    <lastmod>${currentDate}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>`;
-  });
-
-  // Pages service-ville
-  mainServices.forEach(service => {
-    cities.forEach(city => {
-      sitemap += `
-  <url>
-    <loc>${baseUrl}/${service.slug}-${city.slug}</loc>
+    <loc>${baseUrl}/${city.slug}</loc>
     <lastmod>${currentDate}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
+  </url>`;
+  });
+
+  // Pages service-ville (ville/service)
+  prestations.forEach((service) => {
+    cities.forEach((city) => {
+      sitemap += `
+  <url>
+    <loc>${baseUrl}/${city.slug}/${service.slug}</loc>
+    <lastmod>${currentDate}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>`;
     });
   });
@@ -100,32 +108,39 @@ function generateSitemapXml() {
   sitemap += `
 </urlset>`;
 
-  return sitemap;
+  return { sitemap, prestationsCount: prestations.length };
 }
 
 // Génération du sitemap
-try {
-  const sitemap = generateSitemapXml();
-  
-  // Écriture dans le fichier public
-  fs.writeFileSync('public/sitemap.xml', sitemap);
-  
-  console.log('✅ Sitemap généré avec succès !');
-  console.log('📄 Fichier: public/sitemap.xml');
-  console.log('🔗 URLs générées:');
-  console.log(`   - 2 pages principales`);
-  console.log(`   - ${cities.length} pages par ville`);
-  console.log(`   - ${mainServices.length * cities.length} pages service-ville`);
-  console.log(`   - Total: ${2 + cities.length + (mainServices.length * cities.length)} URLs`);
-  
-  // Affichage d'exemples
-  console.log('\n📋 Exemples d\'URLs générées:');
-  console.log('   - https://kaydidi.fr/coiffeur-marseille');
-  console.log('   - https://kaydidi.fr/twist-aix-en-provence');
-  console.log('   - https://kaydidi.fr/braids-aubagne');
-  console.log('   - https://kaydidi.fr/vanille-plan-de-cuques');
-  
-} catch (error) {
-  console.error('❌ Erreur lors de la génération:', error.message);
-  process.exit(1);
-}
+(async () => {
+  try {
+    console.log("🚀 Génération du sitemap depuis l'API...\n");
+
+    const { sitemap, prestationsCount } = await generateSitemapXml();
+
+    // Écriture dans le fichier public
+    fs.writeFileSync("../public/sitemap.xml", sitemap);
+
+    console.log("✅ Sitemap généré avec succès !");
+    console.log("📄 Fichier: public/sitemap.xml");
+    console.log("🔗 URLs générées:");
+    console.log(`   - 2 pages principales`);
+    console.log(`   - ${cities.length} pages par ville`);
+    console.log(`   - ${prestationsCount * cities.length} pages service-ville`);
+    console.log(`   - Total: ${2 + cities.length + prestationsCount * cities.length} URLs`);
+
+    // Affichage d'exemples
+    console.log("\n📋 Exemples d'URLs générées:");
+    console.log("   - https://kaydidicoiffure.fr/");
+    console.log("   - https://kaydidicoiffure.fr/reservation");
+    console.log("   - https://kaydidicoiffure.fr/marseille");
+    console.log("   - https://kaydidicoiffure.fr/marseille/coupe-adulte");
+    console.log("   - https://kaydidicoiffure.fr/aix-en-provence/coupe-adulte");
+
+    console.log("\n✨ Sitemap prêt pour le déploiement !");
+  } catch (error) {
+    console.error("❌ Erreur lors de la génération:", error.message);
+    console.error(error.stack);
+    process.exit(1);
+  }
+})();
