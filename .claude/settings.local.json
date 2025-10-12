@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npx tsx:*)"
+      "Bash(npx tsx:*)",
+      "mcp__ide__getDiagnostics",
+      "Bash(npm run build:*)"
     ],
     "deny": [],
     "ask": []

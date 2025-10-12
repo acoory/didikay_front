@@ -1,22 +1,82 @@
-
-import { useParams } from 'react-router';
-import { ServiceLocalPage } from '../../components/ServiceLocalPage';
-import { cities, mainServices } from '../../data/localSeoData';
-import NotFound from '../NotFound';
+import { useParams } from "react-router";
+import { useEffect, useState } from "react";
+import { ServiceLocalPage } from "../../components/ServiceLocalPage";
+import { cities } from "../../data/localSeoData";
+import prestationService from "../../services/prestationService";
+import NotFound from "../NotFound";
 
 export default function ServiceCityPage() {
   const { city, service } = useParams<{ city: string; service: string }>();
-  
-  if (!city || !service) {
+  const [serviceData, setServiceData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
+
+  useEffect(() => {
+    const fetchServiceData = async () => {
+      if (!city || !service) {
+        setNotFound(true);
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await prestationService.getPrestations();
+        // Extraire toutes les sous-prestations de toutes les prestations
+        const allSubPrestations: any[] = [];
+        response.data.prestation.forEach((prestation: any) => {
+          if (prestation.subprestations) {
+            prestation.subprestations.forEach((subPrestation: any) => {
+              allSubPrestations.push({
+                id: subPrestation.id,
+                name: subPrestation.name,
+                slug: subPrestation.name.toLowerCase().replace(/[\s/]+/g, "-"),
+                description: subPrestation.description || "",
+                price: subPrestation.price || "0.00",
+                duration: subPrestation.duration || 0,
+                category: prestation.name.toLowerCase(),
+              });
+            });
+          }
+        });
+
+        // Chercher le service correspondant
+        const foundService = allSubPrestations.find((s) => s.slug === service);
+
+        if (!foundService) {
+          setNotFound(true);
+        } else {
+          setServiceData(foundService);
+        }
+        setLoading(false);
+      } catch (error) {
+        console.error("Erreur lors de la récupération du service:", error);
+        setNotFound(true);
+        setLoading(false);
+      }
+    };
+
+    fetchServiceData();
+  }, [city, service]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#e86126] mx-auto"></div>
+          <p className="mt-4 text-gray-600">Chargement...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!city || !service || notFound || !serviceData) {
     return <NotFound />;
   }
 
-  // Trouve la ville et le service correspondants
-  // Structure: /marseille/twist ou /aix-en-provence/vanille
-  const cityData = cities.find(c => c.slug === city);
-  const serviceData = mainServices.find(s => s.slug === service);
+  // Trouve la ville correspondante
+  const cityData = cities.find((c) => c.slug === city);
 
-  if (!serviceData || !cityData) {
+  if (!cityData) {
     return <NotFound />;
   }
 
