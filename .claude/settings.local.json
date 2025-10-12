@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npx tsx:*)"
+      "Bash(npx tsx:*)",
+      "mcp__ide__getDiagnostics",
+      "Bash(npm run build:*)",
+      "Bash(cat:*)",
+      "Bash(npm run generate:sitemap:*)"
     ],
     "deny": [],
     "ask": []

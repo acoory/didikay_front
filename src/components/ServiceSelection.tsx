@@ -1,31 +1,106 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Prestation, BookingSelection, PriceVariant } from "../types/booking";
 import { ChevronRight, Clock, Euro, Info, ChevronDown } from "lucide-react";
 import moment from "moment";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSearchParams } from "react-router";
+import { sub } from "framer-motion/client";
 
 interface ServiceSelectionProps {
-  services: Prestation[];
+  prestations: Prestation[];
   selection: BookingSelection;
   onSelect: (selection: BookingSelection) => void;
   setDevis: any;
   devis: any;
   onResetPrestation?: () => void;
+  expandedSubPrestation?: number | null;
+  setExpandedSubPrestation?: (id: number | null) => void;
 }
 
-export function ServiceSelection({ services, selection, onSelect, setDevis, devis, onResetPrestation }: ServiceSelectionProps) {
+export function ServiceSelection({
+  prestations,
+  selection,
+  onSelect,
+  setDevis,
+  devis,
+  onResetPrestation,
+  expandedSubPrestation: externalExpandedSubPrestation,
+  setExpandedSubPrestation: externalSetExpandedSubPrestation,
+}: ServiceSelectionProps) {
+  const [searchParams] = useSearchParams();
   const [selectedVariants, setSelectedVariants] = useState<Record<number, number>>({});
   const [expandedServices, setExpandedServices] = useState<Record<number, boolean>>({});
-  const [expandedSubPrestation, setExpandedSubPrestation] = useState<number | null>(null);
+  const [internalExpandedSubPrestation, setInternalExpandedSubPrestation] = useState<number | null>(null);
+
+  const subPrestationRefs = React.useRef<Record<string, HTMLDivElement | null>>({});
+
+  // Utiliser les props si elles sont fournies, sinon utiliser le state interne
+  const expandedSubPrestation = externalExpandedSubPrestation !== undefined ? externalExpandedSubPrestation : internalExpandedSubPrestation;
+  const setExpandedSubPrestation = externalSetExpandedSubPrestation || setInternalExpandedSubPrestation;
+
+  useEffect(() => {
+    console.log("Prestations disponibles :", prestations);
+    if (!prestations.length) return;
+
+    const subcategoryParam = searchParams.get("subcategory");
+    const serviceParam = searchParams.get("service");
+
+    console.log("Paramètres de recherche :", subcategoryParam, serviceParam);
+
+    if (subcategoryParam) {
+      // trouver la subPrestation correspondante
+      let found = false;
+
+      prestations.forEach((prestation: any) => {
+        // console.log("Vérification de la prestation :", prestation.name);
+        // console.log("Comparaison de :", prestation.name.toLowerCase(), "avec", subcategoryParam.toLowerCase());
+        // console.log("boolean", encodeURIComponent(prestation.name.toLowerCase()) === encodeURIComponent(subcategoryParam.toLowerCase()));
+
+        if (encodeURIComponent(prestation.name.toLowerCase()) === encodeURIComponent(subcategoryParam.toLowerCase())) {
+          handlePrestationSelect(prestation.id);
+
+          if (serviceParam) {
+            prestation.subprestations.forEach((subPrestation: any) => {
+              if (subPrestation.name.toLowerCase().replace(/[\s/]+/g, "-") === serviceParam) {
+                setExpandedSubPrestation(subPrestation.id);
+                return;
+              }
+            });
+          }
+        }
+
+        // console.log("boolean", encodeURIComponent(prestation.name.toLowerCase()) === encodeURIComponent(subcategoryParam.toLowerCase()));
+      });
+    }
+  }, [prestations, searchParams]);
+
+  console.log("Tresses/Vanilles sans rajouts".toLowerCase().replace(/[\s/]+/g, "-"));
+
+  useEffect(() => {
+    if (!expandedSubPrestation) return;
+
+    const el = subPrestationRefs.current[expandedSubPrestation];
+    if (!el) return;
+
+    // Si tu as un header fixe, ajuste cette valeur
+    const headerOffset = 80;
+
+    // attendre la fin de l'animation d'ouverture / layout
+    setTimeout(() => {
+      // calcul précis de la position absolue
+      const y = el.getBoundingClientRect().top + window.pageYOffset - headerOffset;
+      window.scrollTo({ top: y, behavior: "smooth" });
+    }, 500);
+  }, [expandedSubPrestation]);
 
   // Fonction utilitaire pour obtenir une copie sécurisée des sélections
   const getSafeSelection = (currentSelection: BookingSelection) => {
     return {
       prestationId: currentSelection.prestationId,
-      subPrestationSelections: {...currentSelection.subPrestationSelections},
+      subPrestationSelections: { ...currentSelection.subPrestationSelections },
       selectedDate: currentSelection.selectedDate,
       selectedTime: currentSelection.selectedTime,
-      slot: currentSelection.slot
+      slot: currentSelection.slot,
     };
   };
 
@@ -41,29 +116,29 @@ export function ServiceSelection({ services, selection, onSelect, setDevis, devi
     safeCopy.subPrestationSelections = {};
     safeCopy.selectedDate = null;
     safeCopy.selectedTime = null;
-    
+
     // Mettre à jour la sélection
     onSelect(safeCopy);
-    
+
     // Ne pas réinitialiser les variantes sélectionnées
     // setSelectedVariants({});
   };
 
   const handleServiceSelect = (prestationId: number, subPrestationId: number, serviceId: number) => {
-    const service = services.find((s) => s.id === prestationId)?.subprestations
-      .find(sub => sub.id === subPrestationId)
-      ?.services.find(s => s.id === serviceId);
+    const service = prestations
+      .find((s) => s.id === prestationId)
+      ?.subprestations.find((sub) => sub.id === subPrestationId)
+      ?.services.find((s) => s.id === serviceId);
 
-    const subPrestation = services.find((s) => s.id === prestationId)?.subprestations
-      .find(sub => sub.id === subPrestationId);
+    const subPrestation = prestations.find((s) => s.id === prestationId)?.subprestations.find((sub) => sub.id === subPrestationId);
 
     if (!service || !subPrestation) return;
 
     // Si le service a des variantes de prix, afficher les options
     if (service.priceVariants && service.priceVariants.length > 0) {
-      setExpandedServices(prev => ({
+      setExpandedServices((prev) => ({
         ...prev,
-        [serviceId]: !prev[serviceId]
+        [serviceId]: !prev[serviceId],
       }));
       return;
     }
@@ -74,22 +149,20 @@ export function ServiceSelection({ services, selection, onSelect, setDevis, devi
       // Désélectionner le service
       const safeCopy = getSafeSelection(selection);
       delete safeCopy.subPrestationSelections[subPrestationId];
-      
+
       // Mettre à jour la sélection
       onSelect(safeCopy);
-      
-      setDevis((prevDevis: any) => 
-        prevDevis.filter((item: any) => item.id !== service.id)
-      );
+
+      setDevis((prevDevis: any) => prevDevis.filter((item: any) => item.id !== service.id));
     } else {
       // Sélectionner le service
       const safeCopy = getSafeSelection(selection);
       safeCopy.prestationId = prestationId;
       safeCopy.subPrestationSelections[subPrestationId] = serviceId;
-      
+
       // Mettre à jour la sélection
       onSelect(safeCopy);
-      
+
       // Construire un nouveau service au format demandé
       const newDevisItem = {
         id: service.id,
@@ -97,15 +170,13 @@ export function ServiceSelection({ services, selection, onSelect, setDevis, devi
         price: service.price,
         duration_minutes: service.duration_minutes,
         servicePriceVariantId: null,
-        subPrestationName: subPrestation.name
+        subPrestationName: subPrestation.name,
       };
-      
+
       // Ajouter au devis sans supprimer les services précédents
       setDevis((prevDevis: any) => {
         if (prevDevis.some((item: any) => item.id === service.id)) {
-          return prevDevis.map((item: any) => 
-            item.id === service.id ? newDevisItem : item
-          );
+          return prevDevis.map((item: any) => (item.id === service.id ? newDevisItem : item));
         }
         return [...prevDevis, newDevisItem];
       });
@@ -113,12 +184,12 @@ export function ServiceSelection({ services, selection, onSelect, setDevis, devi
   };
 
   const handlePriceVariantSelect = (prestationId: number, subPrestationId: number, serviceId: number, variant: PriceVariant) => {
-    const selectedService = services.find((s) => s.id === prestationId)?.subprestations
-      .find(sub => sub.id === subPrestationId)
-      ?.services.find(s => s.id === serviceId);
+    const selectedService = prestations
+      .find((s) => s.id === prestationId)
+      ?.subprestations.find((sub) => sub.id === subPrestationId)
+      ?.services.find((s) => s.id === serviceId);
 
-    const subPrestation = services.find((s) => s.id === prestationId)?.subprestations
-      .find(sub => sub.id === subPrestationId);
+    const subPrestation = prestations.find((s) => s.id === prestationId)?.subprestations.find((sub) => sub.id === subPrestationId);
 
     if (!selectedService || !subPrestation) return;
 
@@ -129,30 +200,28 @@ export function ServiceSelection({ services, selection, onSelect, setDevis, devi
       const newSelectedVariants = { ...selectedVariants };
       delete newSelectedVariants[serviceId];
       setSelectedVariants(newSelectedVariants);
-      
+
       // Faire une copie sécurisée de la sélection actuelle
       const safeCopy = getSafeSelection(selection);
       delete safeCopy.subPrestationSelections[subPrestationId];
-      
+
       // Mettre à jour la sélection
       onSelect(safeCopy);
-      
+
       // Mise à jour du devis
-      setDevis((prevDevis: any) => 
-        prevDevis.filter((item: any) => item.id !== serviceId)
-      );
+      setDevis((prevDevis: any) => prevDevis.filter((item: any) => item.id !== serviceId));
     } else {
       // Mettre à jour les variantes sélectionnées en ajoutant celle qu'on vient de choisir
-      setSelectedVariants(prev => ({
+      setSelectedVariants((prev) => ({
         ...prev,
-        [serviceId]: variant.id
+        [serviceId]: variant.id,
       }));
 
       // Créer une copie sécurisée de la sélection actuelle
       const safeCopy = getSafeSelection(selection);
       safeCopy.prestationId = prestationId;
       safeCopy.subPrestationSelections[subPrestationId] = serviceId;
-      
+
       // Mettre à jour la sélection
       onSelect(safeCopy);
 
@@ -164,25 +233,21 @@ export function ServiceSelection({ services, selection, onSelect, setDevis, devi
         duration_minutes: variant.duration || 0,
         servicePriceVariantId: variant.id,
         variantName: variant.name,
-        subPrestationName: subPrestation.name
+        subPrestationName: subPrestation.name,
       };
 
       setDevis((prevDevis: any) => {
         // Si ce service existe déjà, le mettre à jour
         if (prevDevis.some((item: any) => item.id === serviceId)) {
-          return prevDevis.map((item: any) => 
-            item.id === serviceId ? newDevisItem : item
-          );
+          return prevDevis.map((item: any) => (item.id === serviceId ? newDevisItem : item));
         }
         // Sinon l'ajouter aux services existants
         const updatedDevis = [...prevDevis, newDevisItem];
-        
+
         return updatedDevis;
       });
     }
   };
-
-  
 
   const minutesToHours = (totalDuration: number) => {
     const duration = moment.duration(totalDuration, "minutes");
@@ -208,7 +273,7 @@ export function ServiceSelection({ services, selection, onSelect, setDevis, devi
       description: string;
     }> = [];
 
-    const selectedPrestation = services.find((p) => p.id === selection.prestationId);
+    const selectedPrestation = prestations.find((p) => p.id === selection.prestationId);
     if (!selectedPrestation) return [];
 
     selectedPrestation.subprestations.forEach((subPrestation) => {
@@ -217,12 +282,12 @@ export function ServiceSelection({ services, selection, onSelect, setDevis, devi
         const service = subPrestation.services.find((s) => s.id === selectedServiceId);
         if (service) {
           if (service.priceVariants && service.priceVariants.length > 0 && selectedVariants[service.id]) {
-            const selectedVariant = service.priceVariants.find(v => v.id === selectedVariants[service.id]);
+            const selectedVariant = service.priceVariants.find((v) => v.id === selectedVariants[service.id]);
             if (selectedVariant) {
               selectedServices.push({
                 ...service,
                 price: selectedVariant.price,
-                duration_minutes: selectedVariant.duration
+                duration_minutes: selectedVariant.duration,
               });
               return;
             }
@@ -237,12 +302,8 @@ export function ServiceSelection({ services, selection, onSelect, setDevis, devi
 
   if (!selection.prestationId) {
     return (
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="grid grid-cols-1 md:grid-cols-2 gap-6"
-      >
-        {services.map((prestation, index, prestationsArray) => (
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {prestations.map((prestation, index, prestationsArray) => (
           <motion.button
             key={prestation.id}
             onClick={() => {
@@ -252,9 +313,7 @@ export function ServiceSelection({ services, selection, onSelect, setDevis, devi
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             className={`bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 ${
-              prestationsArray.length % 2 !== 0 && index === prestationsArray.length - 1
-                ? "md:col-span-2"
-                : ""
+              prestationsArray.length % 2 !== 0 && index === prestationsArray.length - 1 ? "md:col-span-2" : ""
             }`}
           >
             <div className="p-8 bg-gradient-to-r from-[#FF6A00] to-[#7B219F]">
@@ -270,26 +329,20 @@ export function ServiceSelection({ services, selection, onSelect, setDevis, devi
     );
   }
 
-  const selectedPrestation = services.find((s) => s.id === selection.prestationId);
+  const selectedPrestation = prestations.find((s) => s.id === selection.prestationId);
   if (!selectedPrestation) return null;
 
   return (
-    <motion.div 
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="space-y-8"
-    >
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
       <div className="flex items-center justify-between bg-white p-4 rounded-xl shadow-md">
         <div className="flex items-center space-x-4">
           <h3 className="text-2xl font-bold text-gray-900">{selectedPrestation.name}</h3>
-          <span className="px-3 py-1 bg-[#ec7f2b26] text-[#e86126] rounded-full text-sm font-medium">
-            {selectedPrestation.subprestations.length} catégories
-          </span>
+          <span className="px-3 py-1 bg-[#ec7f2b26] text-[#e86126] rounded-full text-sm font-medium">{selectedPrestation.subprestations.length} catégories</span>
         </div>
-        <motion.button 
+        <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          onClick={() => handlePrestationSelect(0)} 
+          onClick={() => handlePrestationSelect(0)}
           className="text-[#e86126] hover:text-[#ec7f2b] font-medium flex items-center space-x-2"
         >
           <span>Changer de prestation</span>
@@ -299,226 +352,222 @@ export function ServiceSelection({ services, selection, onSelect, setDevis, devi
 
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
         <div className="p-6 space-y-6">
-          {selectedPrestation.subprestations.sort((a:any,b:any) => a.order_index - b.order_index).map((subPrestation, index) => (
-            <motion.div 
-              key={subPrestation.id} 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="border rounded-xl overflow-hidden"
-            >
-              <div 
-                className="flex flex-col md:flex-row md:items-center justify-between p-4 bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors"
-                onClick={() => setExpandedSubPrestation(expandedSubPrestation === subPrestation.id ? null : subPrestation.id)}
+          {selectedPrestation.subprestations
+            .sort((a: any, b: any) => a.order_index - b.order_index)
+            .map((subPrestation, index) => (
+              <motion.div
+                key={subPrestation.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className="border rounded-xl overflow-hidden"
+                ref={(el) => (subPrestationRefs.current[subPrestation.id] = el)}
               >
-                <div className="flex items-center space-x-4">
-                  <h4 className="text-xl font-semibold text-gray-900">{subPrestation.name}</h4>
-                  {selection.subPrestationSelections[subPrestation.id] && (
-                    <span className="px-2 py-1 bg-[#ec7f2b26] text-[#e86126] rounded-full text-sm font-medium">
-                      Sélectionné
-                    </span>
-                  )}
+                <div
+                  className="flex flex-col md:flex-row md:items-center justify-between p-4 bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors"
+                  onClick={() => setExpandedSubPrestation(expandedSubPrestation === subPrestation.id ? null : subPrestation.id)}
+                >
+                  <div className="flex items-center space-x-4">
+                    <h4 className="text-xl font-semibold text-gray-900">{subPrestation.name}</h4>
+                    {selection.subPrestationSelections[subPrestation.id] && (
+                      <span className="px-2 py-1 bg-[#ec7f2b26] text-[#e86126] rounded-full text-sm font-medium">Sélectionné</span>
+                    )}
+                  </div>
+                  <div className="flex items-center md:space-x-3">
+                    <span className="hidden md:block text-sm text-gray-500">{subPrestation.services.length} services disponibles</span>
+                    <motion.div
+                      animate={{ rotate: expandedSubPrestation === subPrestation.id ? 180 : 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="bg-[#ec7f2b26] rounded-full p-1 mr-2 md:mr-0"
+                    >
+                      <ChevronDown className={`md:h-5 md:w-5 h-4 w-4 ${expandedSubPrestation === subPrestation.id ? "text-[#e86126]" : "text-gray-500"}`} />
+                    </motion.div>
+                    <span className="text-sm font-medium text-[#e86126]">{expandedSubPrestation === subPrestation.id ? "Masquer" : "Afficher les services"}</span>
+                  </div>
                 </div>
-                <div className="flex items-center md:space-x-3">
-                  <span className="hidden md:block text-sm text-gray-500">
-                    {subPrestation.services.length} services disponibles
-                  </span>
-                  <motion.div
-                    animate={{ rotate: expandedSubPrestation === subPrestation.id ? 180 : 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="bg-[#ec7f2b26] rounded-full p-1 mr-2 md:mr-0"
-                  >
-                    <ChevronDown className={`md:h-5 md:w-5 h-4 w-4 ${expandedSubPrestation === subPrestation.id ? "text-[#e86126]" : "text-gray-500"}`} />
-                  </motion.div>
-                  <span className="text-sm font-medium text-[#e86126]">
-                    {expandedSubPrestation === subPrestation.id ? "Masquer" : "Afficher les services"}
-                  </span>
-                </div>
-              </div>
-              
-              <AnimatePresence>
-                {expandedSubPrestation === subPrestation.id && (
-                  <motion.div 
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="overflow-hidden"
-                  >
-                    <div className="p-4">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {subPrestation.services
-                          .sort((a: any, b: any) => a?.price - b?.price)
-                          .map((service, serviceIndex, servicesArray) => (
-                            <motion.div 
-                              key={service.id} 
-                              className={`space-y-3 bg-gray-50 p-4 rounded-xl ${
-                                servicesArray.length % 2 !== 0 && serviceIndex === servicesArray.length - 1
-                                  ? "sm:col-span-2"
-                                  : ""
-                              }`}
-                              whileHover={{ scale: 1.02 }}
-                              transition={{ duration: 0.2 }}
-                            >
-                              <div className="flex flex-col justify-between">
-                                <div className="flex items-start mt-[10px] space-x-2">
-                                  <span className="flex flex-col gap-1 font-semibold text-gray-900">
-                                    {service.name}
-                                    <div className="flex items-center text-[#e86126] font-semibold">
-                                      {service.priceVariants && service.priceVariants.length > 0 ? (
-                                        <>
-                                          <span className="text-sm mr-1">à partir de</span>
-                                          {Math.min(...service.priceVariants.map(v => parseFloat(v.price)))}€
-                                        </>
+
+                <AnimatePresence>
+                  {expandedSubPrestation === subPrestation.id && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="p-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          {subPrestation.services
+                            .sort((a: any, b: any) => a?.price - b?.price)
+                            .map((service, serviceIndex, servicesArray) => (
+                              <motion.div
+                                key={service.id}
+                                className={`space-y-3 bg-gray-50 p-4 rounded-xl ${
+                                  servicesArray.length % 2 !== 0 && serviceIndex === servicesArray.length - 1 ? "sm:col-span-2" : ""
+                                }`}
+                                whileHover={{ scale: 1.02 }}
+                                transition={{ duration: 0.2 }}
+                              >
+                                <div className="flex flex-col justify-between">
+                                  <div className="flex items-start mt-[10px] space-x-2">
+                                    <span className="flex flex-col gap-1 font-semibold text-gray-900">
+                                      {service.name}
+                                      <div className="flex items-center text-[#e86126] font-semibold">
+                                        {service.priceVariants && service.priceVariants.length > 0 ? (
+                                          <>
+                                            <span className="text-sm mr-1">à partir de</span>
+                                            {Math.min(...service.priceVariants.map((v) => parseFloat(v.price)))}€
+                                          </>
+                                        ) : (
+                                          `${service.price}€`
+                                        )}
+                                      </div>
+                                    </span>
+                                    <div
+                                      style={{
+                                        marginRight: "10px",
+                                        marginTop: "3px",
+                                      }}
+                                      className="flex items-center text-sm text-gray-500"
+                                    >
+                                      {service.priceVariants.length > 0 ? (
+                                        ""
                                       ) : (
-                                        `${service.price}€`
+                                        <>
+                                          <Clock className="h-4 w-4 mr-1" />
+                                          {minutesToHours(service.duration_minutes)}
+                                        </>
                                       )}
                                     </div>
-                                  </span>
-                                  <div
-                                    style={{
-                                      marginRight: "10px",
-                                      marginTop: "3px"
-                                    }}
-                                    className="flex items-center text-sm text-gray-500"
-                                  >
-                                    {service.priceVariants.length > 0 ? "" : (
-                                      <>
-                                        <Clock className="h-4 w-4 mr-1" />
-                                        {minutesToHours(service.duration_minutes)}
-                                      </>
-                                    )}
                                   </div>
+                                  <div className="flex items-center text-[#e86126] font-semibold">{/* Commentaire supprimé pour clarté */}</div>
                                 </div>
-                                <div className="flex items-center text-[#e86126] font-semibold">
-                                  {/* Commentaire supprimé pour clarté */}
-                                </div>
-                              </div>
 
-                              {service.description && (
-                                <div className="flex items-start space-x-2 text-sm text-gray-600">
-                                  <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                                  <span>{service.description}</span>
-                                </div>
-                              )}
+                                {service.description && (
+                                  <div className="flex items-start space-x-2 text-sm text-gray-600">
+                                    <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                                    <span>{service.description}</span>
+                                  </div>
+                                )}
 
-                              <div className="space-y-2 pt-2">
-                                {(!service.priceVariants || service.priceVariants.length === 0) ? (
-                                  <motion.button
-                                    whileHover={{ scale: 1.01 }}
-                                    whileTap={{ scale: 0.99 }}
-                                    onClick={() => {
-                                      const isSelected = selection.subPrestationSelections[subPrestation.id] === service.id;
-                                      
-                                      if (isSelected) {
-                                        // Désélectionner le service
-                                        const newSubPrestationSelections = { ...selection.subPrestationSelections };
-                                        delete newSubPrestationSelections[subPrestation.id];
-                                        
-                                        // Utiliser la fonction utilitaire pour créer une copie sécurisée
-                                        const safeCopy = getSafeSelection(selection);
-                                        delete safeCopy.subPrestationSelections[subPrestation.id];
-                                        
-                                        // Mettre à jour la sélection
-                                        onSelect(safeCopy);
-                                        
-                                        setDevis((prevDevis: any) => 
-                                          prevDevis.filter((item: any) => item.id !== service.id)
-                                        );
-                                      } else {
-                                        // Sélectionner le service sans réinitialiser les variantes déjà sélectionnées
-                                        // Créer un nouvel objet devis formaté correctement
-                                        const newDevisItem = {
-                                          id: service.id,
-                                          name: service.name,
-                                          price: service.price,
-                                          duration_minutes: service.duration_minutes,
-                                          servicePriceVariantId: null,
-                                          variantName: null,
-                                          subPrestationName: subPrestation.name
-                                        };
-                                        
-                                        // Utiliser la fonction utilitaire pour créer une copie sécurisée
-                                        const safeCopy = getSafeSelection(selection);
-                                        safeCopy.prestationId = selectedPrestation.id;
-                                        safeCopy.subPrestationSelections[subPrestation.id] = service.id;
-                                        
-                                        // Mettre à jour la sélection
-                                        onSelect(safeCopy);
-                                        
-                                        setDevis((prevDevis: any) => {
-                                          if (prevDevis.some((item: any) => item.id === service.id)) {
-                                            return prevDevis.map((item: any) => 
-                                              item.id === service.id ? newDevisItem : item
-                                            );
-                                          }
-                                          
-                                          const updatedDevis = [...prevDevis, newDevisItem];
-                                          
-                                          return updatedDevis;
-                                        });
+                                <div className="space-y-2 pt-2">
+                                  {!service.priceVariants || service.priceVariants.length === 0 ? (
+                                    <motion.button
+                                      whileHover={{ scale: 1.01 }}
+                                      whileTap={{ scale: 0.99 }}
+                                      onClick={() => {
+                                        const isSelected = selection.subPrestationSelections[subPrestation.id] === service.id;
+
+                                        if (isSelected) {
+                                          // Désélectionner le service
+                                          const newSubPrestationSelections = { ...selection.subPrestationSelections };
+                                          delete newSubPrestationSelections[subPrestation.id];
+
+                                          // Utiliser la fonction utilitaire pour créer une copie sécurisée
+                                          const safeCopy = getSafeSelection(selection);
+                                          delete safeCopy.subPrestationSelections[subPrestation.id];
+
+                                          // Mettre à jour la sélection
+                                          onSelect(safeCopy);
+
+                                          setDevis((prevDevis: any) => prevDevis.filter((item: any) => item.id !== service.id));
+                                        } else {
+                                          // Sélectionner le service sans réinitialiser les variantes déjà sélectionnées
+                                          // Créer un nouvel objet devis formaté correctement
+                                          const newDevisItem = {
+                                            id: service.id,
+                                            name: service.name,
+                                            price: service.price,
+                                            duration_minutes: service.duration_minutes,
+                                            servicePriceVariantId: null,
+                                            variantName: null,
+                                            subPrestationName: subPrestation.name,
+                                          };
+
+                                          // Utiliser la fonction utilitaire pour créer une copie sécurisée
+                                          const safeCopy = getSafeSelection(selection);
+                                          safeCopy.prestationId = selectedPrestation.id;
+                                          safeCopy.subPrestationSelections[subPrestation.id] = service.id;
+
+                                          // Mettre à jour la sélection
+                                          onSelect(safeCopy);
+
+                                          setDevis((prevDevis: any) => {
+                                            if (prevDevis.some((item: any) => item.id === service.id)) {
+                                              return prevDevis.map((item: any) => (item.id === service.id ? newDevisItem : item));
+                                            }
+
+                                            const updatedDevis = [...prevDevis, newDevisItem];
+
+                                            return updatedDevis;
+                                          });
+                                        }
+                                      }}
+                                      disabled={
+                                        !!selection.subPrestationSelections[subPrestation.id] && selection.subPrestationSelections[subPrestation.id] !== service.id
                                       }
-                                    }}
-                                    disabled={!!selection.subPrestationSelections[subPrestation.id] && selection.subPrestationSelections[subPrestation.id] !== service.id}
-                                    className={`w-full flex items-center justify-between p-3 rounded-lg border transition-all ${
-                                      selection.subPrestationSelections[subPrestation.id] === service.id
-                                        ? "bg-[#ec7f2b26] border-[#e86126] text-[#e86126]"
-                                        : !!selection.subPrestationSelections[subPrestation.id] && selection.subPrestationSelections[subPrestation.id] !== service.id
+                                      className={`w-full flex items-center justify-between p-3 rounded-lg border transition-all ${
+                                        selection.subPrestationSelections[subPrestation.id] === service.id
+                                          ? "bg-[#ec7f2b26] border-[#e86126] text-[#e86126]"
+                                          : !!selection.subPrestationSelections[subPrestation.id] && selection.subPrestationSelections[subPrestation.id] !== service.id
                                           ? "border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed"
                                           : "border-gray-200 hover:border-[#ec7f2b] hover:bg-[#ec7f2b26]"
-                                    }`}
-                                  >
-                                    <span className="font-medium">
-                                      {selection.subPrestationSelections[subPrestation.id] === service.id ? "Désélectionner" : "Sélectionner"}
-                                    </span>
-                                    <ChevronRight className="h-5 w-5" />
-                                  </motion.button>
-                                ) : (
-                                  <motion.div 
-                                    initial={{ opacity: 0, height: 0 }}
-                                    animate={{ opacity: 1, height: "auto" }}
-                                    exit={{ opacity: 0, height: 0 }}
-                                    className="space-y-2"
-                                  >
-                                    {service.priceVariants.sort((a:any, b:any) => parseFloat(a.price) - parseFloat(b.price)).map((variant:any) => (
-                                      <motion.button
-                                        key={variant.id}
-                                        whileHover={{ scale: 1.01 }}
-                                        whileTap={{ scale: 0.99 }}
-                                        onClick={() => handlePriceVariantSelect(selectedPrestation.id, subPrestation.id, service.id, variant)}
-                                        disabled={!!selection.subPrestationSelections[subPrestation.id] && selection.subPrestationSelections[subPrestation.id] !== service.id}
-                                        className={`w-full flex items-center justify-between p-3 rounded-lg border transition-all ${
-                                          selectedVariants[service.id] === variant.id
-                                            ? "bg-[#ec7f2b26] border-[#e86126] text-[#e86126]"
-                                            : !!selection.subPrestationSelections[subPrestation.id] && selection.subPrestationSelections[subPrestation.id] !== service.id
-                                              ? "border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed"
-                                              : "border-gray-200 hover:border-[#ec7f2b] hover:bg-[#ec7f2b26]"
-                                        }`}
-                                      >
-                                        <div className="flex flex-col items-start">
-                                          <span className="font-medium">{variant.name}</span>
-                                          {variant.description && (
-                                            <span className="text-sm text-gray-500 text-left">{variant.description}</span>
-                                          )}
-                                        </div>
-                                        <div className="flex flex-row md:flex-row items-center space-x-3">
-                                          <span className="font-semibold">{variant.price}€</span>
-                                          <span className="text-sm text-gray-500">{minutesToHours(variant.duration)}</span>
-                                        </div>
-                                      </motion.button>
-                                    ))}
-                                  </motion.div>
-                                )}
-                              </div>
-                            </motion.div>
-                          ))}
+                                      }`}
+                                    >
+                                      <span className="font-medium">
+                                        {selection.subPrestationSelections[subPrestation.id] === service.id ? "Désélectionner" : "Sélectionner"}
+                                      </span>
+                                      <ChevronRight className="h-5 w-5" />
+                                    </motion.button>
+                                  ) : (
+                                    <motion.div
+                                      initial={{ opacity: 0, height: 0 }}
+                                      animate={{ opacity: 1, height: "auto" }}
+                                      exit={{ opacity: 0, height: 0 }}
+                                      className="space-y-2"
+                                    >
+                                      {service.priceVariants
+                                        .sort((a: any, b: any) => parseFloat(a.price) - parseFloat(b.price))
+                                        .map((variant: any) => (
+                                          <motion.button
+                                            key={variant.id}
+                                            whileHover={{ scale: 1.01 }}
+                                            whileTap={{ scale: 0.99 }}
+                                            onClick={() => handlePriceVariantSelect(selectedPrestation.id, subPrestation.id, service.id, variant)}
+                                            disabled={
+                                              !!selection.subPrestationSelections[subPrestation.id] && selection.subPrestationSelections[subPrestation.id] !== service.id
+                                            }
+                                            className={`w-full flex items-center justify-between p-3 rounded-lg border transition-all ${
+                                              selectedVariants[service.id] === variant.id
+                                                ? "bg-[#ec7f2b26] border-[#e86126] text-[#e86126]"
+                                                : !!selection.subPrestationSelections[subPrestation.id] &&
+                                                  selection.subPrestationSelections[subPrestation.id] !== service.id
+                                                ? "border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed"
+                                                : "border-gray-200 hover:border-[#ec7f2b] hover:bg-[#ec7f2b26]"
+                                            }`}
+                                          >
+                                            <div className="flex flex-col items-start">
+                                              <span className="font-medium">{variant.name}</span>
+                                              {variant.description && <span className="text-sm text-gray-500 text-left">{variant.description}</span>}
+                                            </div>
+                                            <div className="flex flex-row md:flex-row items-center space-x-3">
+                                              <span className="font-semibold">{variant.price}€</span>
+                                              <span className="text-sm text-gray-500">{minutesToHours(variant.duration)}</span>
+                                            </div>
+                                          </motion.button>
+                                        ))}
+                                    </motion.div>
+                                  )}
+                                </div>
+                              </motion.div>
+                            ))}
+                        </div>
                       </div>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
-          ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            ))}
         </div>
       </div>
     </motion.div>
