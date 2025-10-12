@@ -119,7 +119,7 @@ async function generateSitemapXml() {
     const { sitemap, prestationsCount } = await generateSitemapXml();
 
     // Écriture dans le fichier public
-    fs.writeFileSync("../public/sitemap.xml", sitemap);
+    fs.writeFileSync("./public/sitemap.xml", sitemap);
 
     console.log("✅ Sitemap généré avec succès !");
     console.log("📄 Fichier: public/sitemap.xml");
